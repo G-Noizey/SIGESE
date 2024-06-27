@@ -1,0 +1,393 @@
+CREATE DATABASE SIGESE;
+
+USE SIGESE;
+
+CREATE TABLE ESTUDIANTES (
+    idEstudiante INT PRIMARY KEY AUTO_INCREMENT,
+    matricula VARCHAR(255) UNIQUE NOT NULL,
+    nombre VARCHAR(255) NOT NULL,
+    apellidoPaterno VARCHAR(255) NOT NULL,
+    apellidoMaterno VARCHAR(255) NOT NULL,
+    genero VARCHAR(255) NOT NULL,
+    fechaNacimiento DATE NOT NULL,
+    direccion VARCHAR(255) NOT NULL,
+    telefono VARCHAR(255),
+    correoElectronico VARCHAR(255),
+    idGrupo INT,
+    estado VARCHAR(255) NOT NULL,
+    FOREIGN KEY (idGrupo) REFERENCES GRUPOS(idGrupo)
+);
+
+CREATE TABLE DOCENTES (
+    idDocente INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(255) NOT NULL,
+    apellidoPaterno VARCHAR(255) NOT NULL,
+    apellidoMaterno VARCHAR(255) NOT NULL,
+    genero VARCHAR(255) NOT NULL,
+    direccion VARCHAR(255) NOT NULL,
+    telefono VARCHAR(255),
+    correoElectronico VARCHAR(255),
+    estado VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE MATERIAS (
+    idMateria INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE GRUPOS (
+    idGrupo INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(255) NOT NULL,
+    semestre VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE CALIFICACIONES (
+    idCalificacion INT PRIMARY KEY AUTO_INCREMENT,
+    idEstudiante INT NOT NULL,
+    idMateria INT NOT NULL,
+    idDocente INT NOT NULL,
+    calificacion DECIMAL(5,2) NOT NULL,
+    fecha DATE NOT NULL,
+    FOREIGN KEY (idEstudiante) REFERENCES ESTUDIANTES(idEstudiante),
+    FOREIGN KEY (idMateria) REFERENCES MATERIAS(idMateria),
+    FOREIGN KEY (idDocente) REFERENCES DOCENTES(idDocente)
+);
+
+
+
+
+
+
+
+
+
+
+
+------------------------------------------------------------------------------
+
+-- ESTUDIANTES
+
+-- Procedimiento Almacenado para obtener todos los estudiantes
+DELIMITER //
+CREATE PROCEDURE getAllEstudiantes()
+BEGIN
+    SELECT * FROM ESTUDIANTES;
+END //
+DELIMITER ;
+
+-- Procedimiento Almacenado para obtener un estudiante por ID
+DELIMITER //
+CREATE PROCEDURE getEstudianteById(IN estudiante_id INT)
+BEGIN
+    SELECT * FROM ESTUDIANTES WHERE idEstudiante = estudiante_id;
+END //
+DELIMITER ;
+
+-- Procedimiento Almacenado para crear un nuevo estudiante
+DELIMITER //
+CREATE PROCEDURE createEstudiante(
+    IN matricula_param VARCHAR(255),
+    IN nombre_param VARCHAR(255),
+    IN apellidoPaterno_param VARCHAR(255),
+    IN apellidoMaterno_param VARCHAR(255),
+    IN genero_param VARCHAR(255),
+    IN fechaNacimiento_param DATE,
+    IN direccion_param VARCHAR(255),
+    IN telefono_param VARCHAR(255),
+    IN correoElectronico_param VARCHAR(255),
+    IN idGrupo_param INT,
+    IN estado_param VARCHAR(255)
+)
+BEGIN
+    INSERT INTO ESTUDIANTES (matricula, nombre, apellidoPaterno, apellidoMaterno, genero, fechaNacimiento, direccion, telefono, correoElectronico, idGrupo, estado)
+    VALUES (matricula_param, nombre_param, apellidoPaterno_param, apellidoMaterno_param, genero_param, fechaNacimiento_param, direccion_param, telefono_param, correoElectronico_param, idGrupo_param, estado_param);
+END //
+DELIMITER ;
+
+-- Procedimiento Almacenado para actualizar un estudiante por ID
+DELIMITER //
+CREATE PROCEDURE updateEstudiante(
+    IN estudiante_id INT,
+    IN matricula_param VARCHAR(255),
+    IN nombre_param VARCHAR(255),
+    IN apellidoPaterno_param VARCHAR(255),
+    IN apellidoMaterno_param VARCHAR(255),
+    IN genero_param VARCHAR(255),
+    IN fechaNacimiento_param DATE,
+    IN direccion_param VARCHAR(255),
+    IN telefono_param VARCHAR(255),
+    IN correoElectronico_param VARCHAR(255),
+    IN idGrupo_param INT,
+    IN estado_param VARCHAR(255)
+)
+BEGIN
+    UPDATE ESTUDIANTES
+    SET matricula = matricula_param,
+        nombre = nombre_param,
+        apellidoPaterno = apellidoPaterno_param,
+        apellidoMaterno = apellidoMaterno_param,
+        genero = genero_param,
+        fechaNacimiento = fechaNacimiento_param,
+        direccion = direccion_param,
+        telefono = telefono_param,
+        correoElectronico = correoElectronico_param,
+        idGrupo = idGrupo_param,
+        estado = estado_param
+    WHERE idEstudiante = estudiante_id;
+END //
+DELIMITER ;
+
+-- Procedimiento Almacenado para eliminar un estudiante por ID
+DELIMITER //
+CREATE PROCEDURE deleteEstudiante(IN estudiante_id INT)
+BEGIN
+    DELETE FROM ESTUDIANTES WHERE idEstudiante = estudiante_id;
+END //
+DELIMITER ;
+
+------------------------------------------------------------------------------------------
+-- DOCENTES
+
+-- Obtener todos los docentes
+DELIMITER //
+CREATE PROCEDURE getAllDocentes()
+BEGIN
+    SELECT * FROM DOCENTES;
+END //
+DELIMITER ;
+
+-- Obtener docente por ID
+DELIMITER //
+CREATE PROCEDURE getDocenteById(IN docente_id INT)
+BEGIN
+    SELECT * FROM DOCENTES WHERE idDocente = docente_id;
+END //
+DELIMITER ;
+
+-- Crear docente
+DELIMITER //
+CREATE PROCEDURE createDocente(
+    IN nombre_param VARCHAR(255),
+    IN apellidoPaterno_param VARCHAR(255),
+    IN apellidoMaterno_param VARCHAR(255),
+    IN genero_param VARCHAR(255),
+    IN direccion_param VARCHAR(255),
+    IN telefono_param VARCHAR(255),
+    IN correoElectronico_param VARCHAR(255),
+    IN estado_param VARCHAR(255)
+)
+BEGIN
+    INSERT INTO DOCENTES (nombre, apellidoPaterno, apellidoMaterno, genero, direccion, telefono, correoElectronico, estado)
+    VALUES (nombre_param, apellidoPaterno_param, apellidoMaterno_param, genero_param, direccion_param, telefono_param, correoElectronico_param, estado_param);
+END //
+DELIMITER ;
+
+-- Actualizar docente
+DELIMITER //
+CREATE PROCEDURE updateDocente(
+    IN docente_id INT,
+    IN nombre_param VARCHAR(255),
+    IN apellidoPaterno_param VARCHAR(255),
+    IN apellidoMaterno_param VARCHAR(255),
+    IN genero_param VARCHAR(255),
+    IN direccion_param VARCHAR(255),
+    IN telefono_param VARCHAR(255),
+    IN correoElectronico_param VARCHAR(255),
+    IN estado_param VARCHAR(255)
+)
+BEGIN
+    UPDATE DOCENTES
+    SET nombre = nombre_param,
+        apellidoPaterno = apellidoPaterno_param,
+        apellidoMaterno = apellidoMaterno_param,
+        genero = genero_param,
+        direccion = direccion_param,
+        telefono = telefono_param,
+        correoElectronico = correoElectronico_param,
+        estado = estado_param
+    WHERE idDocente = docente_id;
+END //
+DELIMITER ;
+
+-- Eliminar docente
+DELIMITER //
+CREATE PROCEDURE deleteDocente(IN docente_id INT)
+BEGIN
+    DELETE FROM DOCENTES WHERE idDocente = docente_id;
+END //
+DELIMITER ;
+
+
+--------------------------------------------------------------------------------------
+
+-- PA´S para MATERIAS, CALIFICACIONES Y GRUPOS
+
+-- Procedimientos almacenados para MATERIAS
+
+-- Obtener todas las materias
+DELIMITER //
+CREATE PROCEDURE getAllMaterias()
+BEGIN
+    SELECT * FROM MATERIAS;
+END //
+DELIMITER ;
+
+-- Obtener materia por ID
+DELIMITER //
+CREATE PROCEDURE getMateriaById(IN materia_id INT)
+BEGIN
+    SELECT * FROM MATERIAS WHERE idMateria = materia_id;
+END //
+DELIMITER ;
+
+-- Crear materia
+DELIMITER //
+CREATE PROCEDURE createMateria(
+    IN nombre_param VARCHAR(255)
+)
+BEGIN
+    INSERT INTO MATERIAS (nombre)
+    VALUES (nombre_param);
+END //
+DELIMITER ;
+
+-- Actualizar materia
+DELIMITER //
+CREATE PROCEDURE updateMateria(
+    IN materia_id INT,
+    IN nombre_param VARCHAR(255)
+)
+BEGIN
+    UPDATE MATERIAS
+    SET nombre = nombre_param
+    WHERE idMateria = materia_id;
+END //
+DELIMITER ;
+
+-- Eliminar materia
+DELIMITER //
+CREATE PROCEDURE deleteMateria(IN materia_id INT)
+BEGIN
+    DELETE FROM MATERIAS WHERE idMateria = materia_id;
+END //
+DELIMITER ;
+
+
+-- Procedimientos almacenados para GRUPOS
+
+-- Obtener todos los grupos
+DELIMITER //
+CREATE PROCEDURE getAllGrupos()
+BEGIN
+    SELECT * FROM GRUPOS;
+END //
+DELIMITER ;
+
+-- Obtener grupo por ID
+DELIMITER //
+CREATE PROCEDURE getGrupoById(IN grupo_id INT)
+BEGIN
+    SELECT * FROM GRUPOS WHERE idGrupo = grupo_id;
+END //
+DELIMITER ;
+
+-- Crear grupo
+DELIMITER //
+CREATE PROCEDURE createGrupo(
+    IN nombre_param VARCHAR(255),
+    IN semestre_param VARCHAR(255)
+)
+BEGIN
+    INSERT INTO GRUPOS (nombre, semestre)
+    VALUES (nombre_param, semestre_param);
+END //
+DELIMITER ;
+
+-- Actualizar grupo
+DELIMITER //
+CREATE PROCEDURE updateGrupo(
+    IN grupo_id INT,
+    IN nombre_param VARCHAR(255),
+    IN semestre_param VARCHAR(255)
+)
+BEGIN
+    UPDATE GRUPOS
+    SET nombre = nombre_param,
+        semestre = semestre_param
+    WHERE idGrupo = grupo_id;
+END //
+DELIMITER ;
+
+-- Eliminar grupo
+DELIMITER //
+CREATE PROCEDURE deleteGrupo(IN grupo_id INT)
+BEGIN
+    DELETE FROM GRUPOS WHERE idGrupo = grupo_id;
+END //
+DELIMITER ;
+
+
+-- Procedimientos almacenados para CALIFICACIONES
+
+-- Obtener todas las calificaciones
+DELIMITER //
+CREATE PROCEDURE getAllCalificaciones()
+BEGIN
+    SELECT * FROM CALIFICACIONES;
+END //
+DELIMITER ;
+
+-- Obtener calificación por ID
+DELIMITER //
+CREATE PROCEDURE getCalificacionById(IN calificacion_id INT)
+BEGIN
+    SELECT * FROM CALIFICACIONES WHERE idCalificacion = calificacion_id;
+END //
+DELIMITER ;
+
+-- Crear calificación
+DELIMITER //
+CREATE PROCEDURE createCalificacion(
+    IN idEstudiante_param INT,
+    IN idMateria_param INT,
+    IN idDocente_param INT,
+    IN calificacion_param DECIMAL(5,2),
+    IN fecha_param DATE
+)
+BEGIN
+    INSERT INTO CALIFICACIONES (idEstudiante, idMateria, idDocente, calificacion, fecha)
+    VALUES (idEstudiante_param, idMateria_param, idDocente_param, calificacion_param, fecha_param);
+END //
+DELIMITER ;
+
+-- Actualizar calificación
+DELIMITER //
+CREATE PROCEDURE updateCalificacion(
+    IN calificacion_id INT,
+    IN idEstudiante_param INT,
+    IN idMateria_param INT,
+    IN idDocente_param INT,
+    IN calificacion_param DECIMAL(5,2),
+    IN fecha_param DATE
+)
+BEGIN
+    UPDATE CALIFICACIONES
+    SET idEstudiante = idEstudiante_param,
+        idMateria = idMateria_param,
+        idDocente = idDocente_param,
+        calificacion = calificacion_param,
+        fecha = fecha_param
+    WHERE idCalificacion = calificacion_id;
+END //
+DELIMITER ;
+
+-- Eliminar calificación
+DELIMITER //
+CREATE PROCEDURE deleteCalificacion(IN calificacion_id INT)
+BEGIN
+    DELETE FROM CALIFICACIONES WHERE idCalificacion = calificacion_id;
+END //
+DELIMITER ;
+
+
+------------------------------------------------
