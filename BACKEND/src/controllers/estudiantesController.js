@@ -1,5 +1,5 @@
-const mysql = require('mysql2/promise'); // Importa mysql2 en modo promesa
-const pool = require('../../db'); // Asegúrate de que el path sea correcto
+const mysql = require('mysql2/promise');
+const pool = require('../../db');
 
 // Obtener todos los estudiantes
 exports.getAllEstudiantes = async (req, res) => {
@@ -31,7 +31,7 @@ exports.getEstudianteById = async (req, res) => {
 exports.createEstudiante = async (req, res) => {
     const estudiante = req.body;
     try {
-        const [result] = await pool.query('CALL createEstudiante(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [
+        const [result] = await pool.query('CALL createEstudiante(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )', [
             estudiante.matricula,
             estudiante.nombre,
             estudiante.apellidoPaterno,
@@ -41,6 +41,7 @@ exports.createEstudiante = async (req, res) => {
             estudiante.direccion,
             estudiante.telefono,
             estudiante.correoElectronico,
+            estudiante.contrasena,
             estudiante.idGrupo,
             estudiante.estado
         ]);
@@ -56,7 +57,7 @@ exports.updateEstudiante = async (req, res) => {
     const { id } = req.params;
     const estudiante = req.body;
     try {
-        const [result] = await pool.query('CALL updateEstudiante(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [
+        const [result] = await pool.query('CALL updateEstudiante(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [
             id,
             estudiante.matricula,
             estudiante.nombre,
@@ -67,6 +68,7 @@ exports.updateEstudiante = async (req, res) => {
             estudiante.direccion,
             estudiante.telefono,
             estudiante.correoElectronico,
+            estudiante.contrasena,
             estudiante.idGrupo,
             estudiante.estado
         ]);
@@ -92,5 +94,78 @@ exports.deleteEstudiante = async (req, res) => {
     } catch (error) {
         console.error(`Error al eliminar estudiante con ID ${id}:`, error);
         res.status(500).json({ error: 'Error al eliminar estudiante' });
+    }
+};
+
+// Agregar imagen de perfil de estudiante
+exports.addEstudianteImgPerfil = async (req, res) => {
+    const { id } = req.params;
+    const imgPerfil = req.body.imgPerfil; 
+    try {
+        const [result] = await pool.query('CALL addEstudianteImgPerfil(?, ?)', [id, imgPerfil]);
+        res.status(200).json({ message: 'Imagen de perfil agregada' });
+    } catch (error) {
+        console.error(`Error al agregar imagen de perfil para estudiante con ID ${id}:`, error);
+        res.status(500).json({ error: 'Error al agregar imagen de perfil' });
+    }
+};
+
+// Actualizar imagen de perfil de estudiante
+exports.updateEstudianteImgPerfil = async (req, res) => {
+    const { id } = req.params;
+    const imgPerfil = req.body.imgPerfil; 
+    try {
+        const [result] = await pool.query('CALL updateEstudianteImgPerfil(?, ?)', [id, imgPerfil]);
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: `Estudiante con ID ${id} no encontrado` });
+        }
+        res.status(200).json({ message: 'Imagen de perfil actualizada' });
+    } catch (error) {
+        console.error(`Error al actualizar imagen de perfil para estudiante con ID ${id}:`, error);
+        res.status(500).json({ error: 'Error al actualizar imagen de perfil' });
+    }
+};
+
+// Login de Estudiante
+exports.loginEstudiante = async (req, res) => {
+    const { matricula, contrasena } = req.body;
+    try {
+        // Llamada al procedimiento almacenado para el login
+        const [rows] = await pool.query('CALL loginEstudiante(?, ?, @result)', [matricula, contrasena]);
+        const [result] = await pool.query('SELECT @result as result');
+        const loginResult = result[0].result;
+
+        if (loginResult === 0) {
+            return res.status(401).json({ error: 'Credenciales incorrectas' });
+        }
+
+        // Obtener información del estudiante
+        const [studentRows] = await pool.query('SELECT * FROM ESTUDIANTES WHERE idEstudiante = ?', [loginResult]);
+
+        if (studentRows.length === 0) {
+            return res.status(404).json({ error: 'Estudiante no encontrado' });
+        }
+
+        const estudiante = studentRows[0];
+
+        // Obtener calificaciones del estudiante
+        const [calificacionesRows] = await pool.query('SELECT * FROM CALIFICACIONES WHERE idEstudiante = ?', [estudiante.idEstudiante]);
+
+        // Construir el objeto de respuesta
+        const response = {
+            message: 'Login exitoso',
+            idEstudiante: estudiante.idEstudiante,
+            nombre: estudiante.nombre,
+            apellidoPaterno: estudiante.apellidoPaterno,
+            apellidoMaterno: estudiante.apellidoMaterno,
+            imgPerfil: estudiante.imgPerfil, // Incluir el campo de imagen de perfil si se necesita
+            calificaciones: calificacionesRows // Incluir las calificaciones del estudiante
+        };
+
+        // Enviar la respuesta
+        res.status(200).json(response);
+    } catch (error) {
+        console.error('Error en el login de estudiante:', error);
+        res.status(500).json({ error: 'Error en el login de estudiante' });
     }
 };

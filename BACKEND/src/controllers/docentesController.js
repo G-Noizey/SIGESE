@@ -1,5 +1,5 @@
-const mysql = require('mysql2/promise'); // Importa mysql2 en modo promesa
-const pool = require('../../db'); // Asegúrate de que el path sea correcto
+const mysql = require('mysql2/promise');
+const pool = require('../../db');
 
 // Obtener todos los docentes
 exports.getAllDocentes = async (req, res) => {
@@ -31,7 +31,7 @@ exports.getDocenteById = async (req, res) => {
 exports.createDocente = async (req, res) => {
     const docente = req.body;
     try {
-        const [result] = await pool.query('CALL createDocente(?, ?, ?, ?, ?, ?, ?, ?)', [
+        const [result] = await pool.query('CALL createDocente(?, ?, ?, ?, ?, ?, ?, ?, ?)', [
             docente.nombre,
             docente.apellidoPaterno,
             docente.apellidoMaterno,
@@ -39,8 +39,10 @@ exports.createDocente = async (req, res) => {
             docente.direccion,
             docente.telefono,
             docente.correoElectronico,
+            docente.contrasena,
             docente.estado
         ]);
+
         res.status(201).json({ message: 'Docente creado', id: result.insertId });
     } catch (error) {
         console.error('Error al crear docente:', error);
@@ -53,7 +55,7 @@ exports.updateDocente = async (req, res) => {
     const { id } = req.params;
     const docente = req.body;
     try {
-        const [result] = await pool.query('CALL updateDocente(?,?, ?, ?, ?, ?, ?, ?, ?)', [
+        const [result] = await pool.query('CALL updateDocente(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [
             id,
             docente.nombre,
             docente.apellidoPaterno,
@@ -62,7 +64,8 @@ exports.updateDocente = async (req, res) => {
             docente.direccion,
             docente.telefono,
             docente.correoElectronico,
-            docente.estado
+            docente.contrasena,
+            docente.estado 
         ]);
         if (result.affectedRows === 0) {
             return res.status(404).json({ error: `Docente con ID ${id} no encontrado` });
@@ -88,3 +91,25 @@ exports.deleteDocente = async (req, res) => {
         res.status(500).json({ error: 'Error al eliminar docente' });
     }
 };
+
+
+// Login de docente
+exports.loginDocente = async (req, res) => {
+    const { correoElectronico, contrasena } = req.body;
+    try {
+        const [rows] = await pool.query('CALL loginDocente(?, ?)', [correoElectronico, contrasena]);
+        if (rows[0].length === 0) {
+            return res.status(401).json({ error: 'Credenciales incorrectas' });
+        }
+        const docente = rows[0][0];
+        // Aquí podrías generar un token JWT si lo deseas
+        res.json({ message: 'Login exitoso', docente });
+    } catch (error) {
+        console.error('Error en el login del docente:', error);
+        res.status(500).json({ error: 'Error en el login del docente' });
+    }
+};
+
+
+
+
