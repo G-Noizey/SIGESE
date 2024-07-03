@@ -1,5 +1,5 @@
 const mysql = require('mysql2/promise'); // Importa mysql2 en modo promesa
-const pool = require('../../db'); // Asegúrate de que el path sea correcto
+const pool = require('../services/db');
 
 // Obtener todos los grupos
 exports.getAllGrupos = async (req, res) => {

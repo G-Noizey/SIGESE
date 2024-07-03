@@ -2,7 +2,7 @@ CREATE DATABASE SIGESE;
 
 USE SIGESE;
 
--- Creación de tablas
+-- CREACIÓN DE TABLAS
 
 CREATE TABLE GRUPOS (
     idGrupo INT PRIMARY KEY AUTO_INCREMENT,
@@ -21,7 +21,7 @@ CREATE TABLE ESTUDIANTES (
     direccion VARCHAR(255) NOT NULL,
     telefono VARCHAR(255),
     correoElectronico VARCHAR(255),
-    imgPerfil BLOB,
+    imgPerfil LONGBLOB,
     contrasena VARCHAR(255) NOT NULL,
     idGrupo INT,
     estado VARCHAR(255) NOT NULL,
@@ -41,15 +41,32 @@ CREATE TABLE DOCENTES (
     estado VARCHAR(255) NOT NULL
 );
 
+CREATE TABLE DOCENTES_GRUPOS (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    idDocente INT,
+    idGrupo INT,
+    FOREIGN KEY (idDocente) REFERENCES DOCENTES(idDocente),
+    FOREIGN KEY (idGrupo) REFERENCES GRUPOS(idGrupo)
+);
+
 CREATE TABLE ADMIN (
     idAdmin INT PRIMARY KEY AUTO_INCREMENT,
     usuario VARCHAR(255) UNIQUE NOT NULL,
-    contrasena VARCHAR(255) NOT NULL
+    contrasena VARCHAR(255) NOT NULL,
+    nombre VARCHAR(255) NOT NULL,
+    apellidoPaterno VARCHAR(255) NOT NULL,
+    apellidoMaterno VARCHAR(255) NOT NULL,
+    correo_electronico VARCHAR(255) NOT NULL
 );
+
+
+
 
 CREATE TABLE MATERIAS (
     idMateria INT PRIMARY KEY AUTO_INCREMENT,
-    nombre VARCHAR(255) NOT NULL
+    nombre VARCHAR(255) NOT NULL,
+    idGrupo INT,
+    FOREIGN KEY (idGrupo) REFERENCES GRUPOS(idGrupo)
 );
 
 CREATE TABLE CALIFICACIONES (
@@ -59,10 +76,18 @@ CREATE TABLE CALIFICACIONES (
     idDocente INT NOT NULL,
     calificacion DECIMAL(5,2) NOT NULL,
     fecha DATE NOT NULL,
+    unidad VARCHAR(255) NOT NULL,
     FOREIGN KEY (idEstudiante) REFERENCES ESTUDIANTES(idEstudiante),
     FOREIGN KEY (idMateria) REFERENCES MATERIAS(idMateria),
     FOREIGN KEY (idDocente) REFERENCES DOCENTES(idDocente)
 );
+
+-- PROCEDIMIENTOS ALMACENADOS Y DEMÁS FUNCIONES YA INCLUÍDOS EN EL MENSAJE ANTERIOR
+-- OMITIDOS PARA NO REPETIR LA INFORMACIÓN EXTENSA.
+
+
+
+
 
 ------------------------------------------------------------------------------
 
@@ -141,10 +166,13 @@ BEGIN
     DELETE FROM ESTUDIANTES WHERE idEstudiante = estudiante_id;
 END //
 
--- Agregar imagen de perfil de estudiante
+
+
+DELIMITER //
+
 CREATE PROCEDURE addEstudianteImgPerfil(
     IN estudiante_id INT,
-    IN imgPerfil_param BLOB
+    IN imgPerfil_param LONGBLOB  -- Cambiado de BLOB a LONGBLOB para soportar imágenes más grandes
 )
 BEGIN
     UPDATE ESTUDIANTES
@@ -152,19 +180,32 @@ BEGIN
     WHERE idEstudiante = estudiante_id;
 END //
 
--- Actualizar imagen de perfil de estudiante
+
+
+DELIMITER //
+
 CREATE PROCEDURE updateEstudianteImgPerfil(
     IN estudiante_id INT,
-    IN imgPerfil_param BLOB
+    IN imgPerfil_param LONGBLOB  -- Cambiado de BLOB a LONGBLOB para soportar imágenes más grandes
 )
 BEGIN
     UPDATE ESTUDIANTES
     SET imgPerfil = imgPerfil_param
     WHERE idEstudiante = estudiante_id;
 END //
+
+DELIMITER ;
+
+
+DELIMITER ;
+
+
+
 
 //
 DELIMITER ;
+
+
 
 -- --------------------------------------------------
 
@@ -241,11 +282,12 @@ BEGIN
     DELETE FROM DOCENTES WHERE idDocente = docente_id;
 END //
 DELIMITER ;
-
 ------------------------------------------------------------------------------
+
 
 -- Procedimientos almacenados para MATERIAS
 
+-- Obtener todas las materias
 DELIMITER //
 CREATE PROCEDURE getAllMaterias()
 BEGIN
@@ -253,6 +295,7 @@ BEGIN
 END //
 DELIMITER ;
 
+-- Obtener materia por ID
 DELIMITER //
 CREATE PROCEDURE getMateriaById(IN materia_id INT)
 BEGIN
@@ -260,34 +303,44 @@ BEGIN
 END //
 DELIMITER ;
 
+-- Crear materia
 DELIMITER //
 CREATE PROCEDURE createMateria(
-    IN nombre_param VARCHAR(255)
+    IN nombre_param VARCHAR(255),
+    IN idGrupo_param INT
 )
 BEGIN
-    INSERT INTO MATERIAS (nombre)
-    VALUES (nombre_param);
+    INSERT INTO MATERIAS (nombre, idGrupo)
+    VALUES (nombre_param, idGrupo_param);
 END //
 DELIMITER ;
 
+-- Actualizar materia por ID
 DELIMITER //
 CREATE PROCEDURE updateMateria(
     IN materia_id INT,
-    IN nombre_param VARCHAR(255)
+    IN nombre_param VARCHAR(255),
+    IN idGrupo_param INT
 )
 BEGIN
     UPDATE MATERIAS
-    SET nombre = nombre_param
+    SET nombre = nombre_param,
+        idGrupo = idGrupo_param
     WHERE idMateria = materia_id;
 END //
 DELIMITER ;
 
+-- Eliminar materia por ID
 DELIMITER //
 CREATE PROCEDURE deleteMateria(IN materia_id INT)
 BEGIN
     DELETE FROM MATERIAS WHERE idMateria = materia_id;
 END //
 DELIMITER ;
+
+
+
+
 
 ------------------------------------------------------------------------------
 
@@ -363,13 +416,15 @@ CREATE PROCEDURE createCalificacion(
     IN idMateria_param INT,
     IN idDocente_param INT,
     IN calificacion_param DECIMAL(5,2),
-    IN fecha_param DATE
+    IN fecha_param DATE,
+    IN unidad_param VARCHAR(255)
 )
 BEGIN
-    INSERT INTO CALIFICACIONES (idEstudiante, idMateria, idDocente, calificacion, fecha)
-    VALUES (idEstudiante_param, idMateria_param, idDocente_param, calificacion_param, fecha_param);
+    INSERT INTO CALIFICACIONES (idEstudiante, idMateria, idDocente, calificacion, fecha, unidad)
+    VALUES (idEstudiante_param, idMateria_param, idDocente_param, calificacion_param, fecha_param, unidad_param);
 END //
 DELIMITER ;
+
 
 DELIMITER //
 CREATE PROCEDURE updateCalificacion(
@@ -423,7 +478,6 @@ END //
 DELIMITER ;
 
 ------------------------------------------------------------------------------
-
 -- Procedimiento almacenado para Login de Docentes
 
 DELIMITER //
@@ -446,7 +500,6 @@ BEGIN
     END IF;
 END //
 DELIMITER ;
-
 ------------------------------------------------------------------------------
 
 -- Procedimiento almacenado para Login de Administradores
@@ -474,3 +527,74 @@ DELIMITER ;
 
 -- -------------------------------------------------------------------------------
 
+-- LISTAR GRUPOS DEL DOCENTE
+
+DELIMITER //
+
+CREATE PROCEDURE getGruposDocente(IN docente_id INT)
+BEGIN
+    SELECT g.*
+    FROM GRUPOS g
+    WHERE g.idGrupo IN (
+        SELECT DISTINCT dg.idGrupo
+        FROM DOCENTES_GRUPOS dg
+        WHERE dg.idDocente = docente_id
+    );
+END //
+
+DELIMITER ;
+
+-- -------------------------------------------------------------------------------
+
+-- LISTAR ESTUDIANTES DEPENDIENDO EL GRUPO
+
+DELIMITER //
+
+CREATE PROCEDURE getAlumnosGrupo(IN docente_id INT, IN grupo_id INT)
+BEGIN
+    SELECT *
+    FROM ESTUDIANTES
+    WHERE idGrupo = grupo_id;
+END //
+
+DELIMITER ;
+
+-- -------------------------------------------------------------------------------
+
+-- ASIGNAR CALIFICACIÓN A ESTUDIANTE 
+
+DELIMITER //
+
+CREATE PROCEDURE asignarCalificaciones(
+    IN estudiante_id INT,
+    IN materia_id INT,
+    IN docente_id INT,
+    IN calificacion DECIMAL(5,2),
+    IN fecha DATE,
+    IN unidad VARCHAR(255)
+)
+BEGIN
+    INSERT INTO CALIFICACIONES (idEstudiante, idMateria, idDocente, calificacion, fecha, unidad)
+    VALUES (estudiante_id, materia_id, docente_id, calificacion, fecha, unidad);
+END //
+
+DELIMITER ;
+
+-- -------------------------------------------------------------------------------
+
+-- ASIGANCIÓN DE GRUPOS A UN DOCENTE
+
+DELIMITER //
+
+CREATE PROCEDURE asignarGrupoDocente(
+    IN docente_id INT,
+    IN grupo_id INT
+)
+BEGIN
+    INSERT INTO DOCENTES_GRUPOS (idDocente, idGrupo)
+    VALUES (docente_id, grupo_id);
+END //
+
+DELIMITER ;
+
+-- -------------------------------------------------------------------------------

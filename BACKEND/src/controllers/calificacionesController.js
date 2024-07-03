@@ -1,5 +1,5 @@
 const mysql = require('mysql2/promise'); // Importa mysql2 en modo promesa
-const pool = require('../../db'); // Asegúrate de que el path sea correcto
+const pool = require('../services/db');
 
 // Obtener todas las calificaciones
 exports.getAllCalificaciones = async (req, res) => {
@@ -31,12 +31,13 @@ exports.getCalificacionById = async (req, res) => {
 exports.createCalificacion = async (req, res) => {
     const calificacion = req.body;
     try {
-        const [result] = await pool.query('CALL createCalificacion(?, ?, ?, ?, ?)', [
+        const [result] = await pool.query('CALL createCalificacion(?, ?, ?, ?, ?, ?)', [
             calificacion.idEstudiante,
             calificacion.idMateria,
             calificacion.idDocente,
             calificacion.calificacion,
-            calificacion.fecha
+            calificacion.fecha,
+            calificacion.unidad
         ]);
         res.status(201).json({ message: 'Calificación creada', id: result.insertId });
     } catch (error) {
@@ -50,13 +51,14 @@ exports.updateCalificacion = async (req, res) => {
     const { id } = req.params;
     const calificacion = req.body;
     try {
-        const [result] = await pool.query('CALL updateCalificacion(?, ?, ?, ?, ?, ?)', [
+        const [result] = await pool.query('CALL updateCalificacion(?, ?, ?, ?, ?, ?, ?)', [
             id,
             calificacion.idEstudiante,
             calificacion.idMateria,
             calificacion.idDocente,
             calificacion.calificacion,
-            calificacion.fecha
+            calificacion.fecha,
+            calificacion.unidad
         ]);
         if (result.affectedRows === 0) {
             return res.status(404).json({ error: `Calificación con ID ${id} no encontrada` });
@@ -82,3 +84,4 @@ exports.deleteCalificacion = async (req, res) => {
         res.status(500).json({ error: 'Error al eliminar calificación' });
     }
 };
+

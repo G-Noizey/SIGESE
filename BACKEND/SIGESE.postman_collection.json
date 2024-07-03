@@ -64,7 +64,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n\r\n\r\n\r\n}",
+							"raw": "{\r\n\r\n\"nombre\":\"Programación\",\r\n\"idGrupo\":\"1\"\r\n\r\n\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -140,7 +140,20 @@
 					"name": "FindAll",
 					"request": {
 						"method": "GET",
-						"header": []
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/sigese/grupos/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"sigese",
+								"grupos",
+								""
+							]
+						}
 					},
 					"response": []
 				},
@@ -148,7 +161,20 @@
 					"name": "FindOne",
 					"request": {
 						"method": "GET",
-						"header": []
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/sigese/grupos/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"sigese",
+								"grupos",
+								"1"
+							]
+						}
 					},
 					"response": []
 				},
@@ -165,7 +191,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"nombre\": \"2B\",\r\n  \"semestre\": 2\r\n\r\n}\r\n",
+							"raw": "{\r\n  \"nombre\": \"1A\",\r\n  \"semestre\": 1\r\n\r\n}\r\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -241,7 +267,26 @@
 					"name": "FindAll",
 					"request": {
 						"method": "GET",
-						"header": []
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZEFkbWluIjoxLCJ1c3VhcmlvIjoiTm9pemV5Iiwibm9tYnJlIjoiTW9pc2VzIiwiYXBlbGxpZG9QYXRlcm5vIjoiTW9yYWxlcyIsImFwZWxsaWRvTWF0ZXJubyI6IkNvbGluIiwiY29ycmVvX2VsZWN0cm9uaWNvIjoibW95bW9yY29sOThAZ21haWwuY29tIiwiaWF0IjoxNzIwMDM1MjY5LCJleHAiOjE3MjAwMzg4Njl9.tqlVeQ--8woDvIaeRm-mAawqsZjyoaHRYz2I_P7Hl-Y",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:3000/sigese/estudiantes/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"sigese",
+								"estudiantes",
+								""
+							]
+						}
 					},
 					"response": []
 				},
@@ -249,7 +294,26 @@
 					"name": "FindOne",
 					"request": {
 						"method": "GET",
-						"header": []
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZEFkbWluIjoxLCJ1c3VhcmlvIjoiTm9pemV5Iiwibm9tYnJlIjoiTW9pc2VzIiwiYXBlbGxpZG9QYXRlcm5vIjoiTW9yYWxlcyIsImFwZWxsaWRvTWF0ZXJubyI6IkNvbGluIiwiY29ycmVvX2VsZWN0cm9uaWNvIjoibW95bW9yY29sOThAZ21haWwuY29tIiwiaWF0IjoxNzE5OTg2NzkzLCJleHAiOjE3MTk5OTAzOTN9.wLZB5KUQCcnO_Oq6jHDaWSJcgnR-4ywQhm52gTiVltE",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:3000/sigese/estudiantes/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"sigese",
+								"estudiantes",
+								"2"
+							]
+						}
 					},
 					"response": []
 				},
@@ -257,7 +321,40 @@
 					"name": "Create",
 					"request": {
 						"method": "POST",
-						"header": []
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZEFkbWluIjoxLCJ1c3VhcmlvIjoiTm9pemV5Iiwibm9tYnJlIjoiTW9pc2VzIiwiYXBlbGxpZG9QYXRlcm5vIjoiTW9yYWxlcyIsImFwZWxsaWRvTWF0ZXJubyI6IkNvbGluIiwiY29ycmVvX2VsZWN0cm9uaWNvIjoibW95bW9yY29sOThAZ21haWwuY29tIiwiaWF0IjoxNzE5OTg2NzkzLCJleHAiOjE3MTk5OTAzOTN9.wLZB5KUQCcnO_Oq6jHDaWSJcgnR-4ywQhm52gTiVltE",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n      \"matricula\": \"20223TN2\",\r\n        \"nombre\": \"Moises\",\r\n        \"apellidoPaterno\": \"Morales\",\r\n        \"apellidoMaterno\": \"Colin\",\r\n        \"genero\": \"Masculino\",\r\n        \"fechaNacimiento\": \"2003-07-30\",\r\n        \"direccion\": \"Temixco #123\",\r\n        \"telefono\": \"7778993212\",\r\n        \"correoElectronico\": \"moi@example.com\",\r\n        \"contrasena\": \"1234\",\r\n        \"idGrupo\": 1,\r\n        \"estado\": \"Activo\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/sigese/estudiantes/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"sigese",
+								"estudiantes",
+								""
+							]
+						}
 					},
 					"response": []
 				},
@@ -274,7 +371,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n \r\n  \"idEstudiante\":\"\",\r\n  \"matricula\": \"2023002\",\r\n  \"nombre\": \"Update\",\r\n  \"apellidoPaterno\": \"Regalado\",\r\n  \"apellidoMaterno\": \"Valdez\",\r\n  \"genero\": \"Masculino\",\r\n  \"fechaNacimiento\": \"2003-07-30\",\r\n  \"direccion\": \"Temixco #123\",\r\n  \"telefono\": \"7778993212\",\r\n  \"correoElectronico\": \"juan@example.com\",\r\n  \"idGrupo\": 4,\r\n  \"estado\": \"Activo\"\r\n}\r\n",
+							"raw": "{\r\n      \"matricula\": \"20223TN1\",\r\n        \"nombre\": \"Juan\",\r\n        \"apellidoPaterno\": \"Regalado\",\r\n        \"apellidoMaterno\": \"Valdez\",\r\n        \"genero\": \"Masculino\",\r\n        \"fechaNacimiento\": \"2003-07-30\",\r\n        \"direccion\": \"Temixco #123\",\r\n        \"telefono\": \"7778993212\",\r\n        \"correoElectronico\": \"juan@example.com\",\r\n        \"contrasena\": \"1234\",\r\n        \"idGrupo\": 1,\r\n        \"estado\": \"Activo\"\r\n}\r\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -282,7 +379,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:3000/sigese/estudiantes/3",
+							"raw": "http://localhost:3000/sigese/estudiantes/1",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -291,7 +388,7 @@
 							"path": [
 								"sigese",
 								"estudiantes",
-								"3"
+								"1"
 							]
 						}
 					},
@@ -309,7 +406,42 @@
 					"name": "UploadImage",
 					"request": {
 						"method": "POST",
-						"header": []
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZEFkbWluIjoxLCJ1c3VhcmlvIjoiTm9pemV5Iiwibm9tYnJlIjoiTW9pc2VzIiwiYXBlbGxpZG9QYXRlcm5vIjoiTW9yYWxlcyIsImFwZWxsaWRvTWF0ZXJubyI6IkNvbGluIiwiY29ycmVvX2VsZWN0cm9uaWNvIjoibW95bW9yY29sOThAZ21haWwuY29tIiwiaWF0IjoxNzE5OTg0NjgxLCJleHAiOjE3MTk5ODgyODF9.SSn-L_4fnfv--keoWTYTWjnuPo8zg06r7BoJtq3E0yo",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "imgPerfil",
+									"type": "file",
+									"src": "/C:/Users/moymo/OneDrive/Imágenes/Capturas de pantalla/2022-01-27 (1).png"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:3000/sigese/estudiantes/imagen/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"sigese",
+								"estudiantes",
+								"imagen",
+								"2"
+							]
+						}
 					},
 					"response": []
 				},
@@ -317,7 +449,42 @@
 					"name": "UpdateImage",
 					"request": {
 						"method": "PUT",
-						"header": []
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZEFkbWluIjoxLCJ1c3VhcmlvIjoiTm9pemV5Iiwibm9tYnJlIjoiTW9pc2VzIiwiYXBlbGxpZG9QYXRlcm5vIjoiTW9yYWxlcyIsImFwZWxsaWRvTWF0ZXJubyI6IkNvbGluIiwiY29ycmVvX2VsZWN0cm9uaWNvIjoibW95bW9yY29sOThAZ21haWwuY29tIiwiaWF0IjoxNzIwMDM0NDc2LCJleHAiOjE3MjAwMzgwNzZ9.Zk9YYv8ltmg-9GZ5k-9KN-37PT8sl-2aiBNbZEgLPjQ",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "imgPerfil",
+									"type": "file",
+									"src": "/C:/Users/moymo/OneDrive/Imágenes/Capturas de pantalla/2021-09-20 (4).png"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:3000/sigese/estudiantes/imagen/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"sigese",
+								"estudiantes",
+								"imagen",
+								"2"
+							]
+						}
 					},
 					"response": []
 				}
@@ -329,8 +496,37 @@
 				{
 					"name": "FindAll",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
-						"header": []
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZEFkbWluIjoxLCJ1c3VhcmlvIjoiTm9pemV5Iiwibm9tYnJlIjoiTW9pc2VzIiwiYXBlbGxpZG9QYXRlcm5vIjoiTW9yYWxlcyIsImFwZWxsaWRvTWF0ZXJubyI6IkNvbGluIiwiY29ycmVvX2VsZWN0cm9uaWNvIjoibW95bW9yY29sOThAZ21haWwuY29tIiwiaWF0IjoxNzIwMDM1MjY5LCJleHAiOjE3MjAwMzg4Njl9.tqlVeQ--8woDvIaeRm-mAawqsZjyoaHRYz2I_P7Hl-Y",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:3000/sigese/docentes/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"sigese",
+								"docentes",
+								""
+							]
+						}
 					},
 					"response": []
 				},
@@ -338,7 +534,33 @@
 					"name": "FindOne",
 					"request": {
 						"method": "GET",
-						"header": []
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZEFkbWluIjoxLCJ1c3VhcmlvIjoiTm9pemV5Iiwibm9tYnJlIjoiTW9pc2VzIiwiYXBlbGxpZG9QYXRlcm5vIjoiTW9yYWxlcyIsImFwZWxsaWRvTWF0ZXJubyI6IkNvbGluIiwiY29ycmVvX2VsZWN0cm9uaWNvIjoibW95bW9yY29sOThAZ21haWwuY29tIiwiaWF0IjoxNzIwMDM1MjY5LCJleHAiOjE3MjAwMzg4Njl9.tqlVeQ--8woDvIaeRm-mAawqsZjyoaHRYz2I_P7Hl-Y",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:3000/sigese/docentes/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"sigese",
+								"docentes",
+								"1"
+							],
+							"query": [
+								{
+									"key": "a",
+									"value": null,
+									"disabled": true
+								}
+							]
+						}
 					},
 					"response": []
 				},
@@ -351,11 +573,16 @@
 								"key": "Content-Type",
 								"value": "application/json",
 								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZERvY2VudGUiOjEsImlhdCI6MTcxOTk4MjExNCwiZXhwIjoxNzE5OTg1NzE0fQ.gFByFNQPbkC5CqAMAuSa2ptOlhCLStzupYolbF2bn6g",
+								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n\"nombre\":\"Hugo\",\r\n\"apellidoPaterno\":\"Alejandrez\",\r\n\"apellidoMaterno\":\"Naranjo\",\r\n\"genero\":\"Masculino\",\r\n\"direccion\":\"Uber Uknown\",\r\n\"telefono\":\"7778390934\",\r\n\"correoElectronico\":\"Hugo@example.com\",\r\n\"estado\":\"Activo\"\r\n}",
+							"raw": "{\r\n\"nombre\":\"Nuevo\",\r\n\"apellidoPaterno\":\"Alejandrez\",\r\n\"apellidoMaterno\":\"Naranjo\",\r\n\"genero\":\"Masculino\",\r\n\"direccion\":\"Uber Uknown\",\r\n\"telefono\":\"7778390934\",\r\n\"correoElectronico\":\"Nuevo@example.com\",\r\n\"contrasena\":\"1234\",\r\n\"estado\":\"Activo\"\r\n\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -387,8 +614,22 @@
 								"key": "Content-Type",
 								"value": "application/json",
 								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZERvY2VudGUiOjEsImlhdCI6MTcxOTk4MjExNCwiZXhwIjoxNzE5OTg1NzE0fQ.gFByFNQPbkC5CqAMAuSa2ptOlhCLStzupYolbF2bn6g",
+								"type": "text"
 							}
 						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \r\n\"nombre\":\"Nuevo\",\r\n\"apellidoPaterno\":\"Alejandrez\",\r\n\"apellidoMaterno\":\"Naranjo\",\r\n\"genero\":\"Masculino\",\r\n\"direccion\":\"Uber Uknown\",\r\n\"telefono\":\"7778390934\",\r\n\"correoElectronico\":\"Nuevo@example.com\",\r\n\"contrasena\":\"1234\",\r\n\"estado\":\"Activo\"\r\n\r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
 							"raw": "http://localhost:3000/sigese/docentes/1",
 							"protocol": "http",
@@ -412,6 +653,88 @@
 						"header": []
 					},
 					"response": []
+				},
+				{
+					"name": "ListGrupos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/sigese/docentes/1/grupos",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"sigese",
+								"docentes",
+								"1",
+								"grupos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ListEstudiantes",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/sigese/docentes/1/grupos/1/estudiantes",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"sigese",
+								"docentes",
+								"1",
+								"grupos",
+								"1",
+								"estudiantes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "AsignarGrupo",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"docente_id\":\"1\",\r\n     \"grupo_id\":\"1\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/sigese/docentes/grupo",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"sigese",
+								"docentes",
+								"grupo"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -422,7 +745,20 @@
 					"name": "FindAll",
 					"request": {
 						"method": "GET",
-						"header": []
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/sigese/calificaciones/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"sigese",
+								"calificaciones",
+								""
+							]
+						}
 					},
 					"response": []
 				},
@@ -430,7 +766,20 @@
 					"name": "FindOne",
 					"request": {
 						"method": "GET",
-						"header": []
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/sigese/calificaciones/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"sigese",
+								"calificaciones",
+								"1"
+							]
+						}
 					},
 					"response": []
 				},
@@ -438,7 +787,22 @@
 					"name": "Create",
 					"request": {
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "\r\n     {\r\n        \"idCalificacion\": 1,\r\n        \"idEstudiante\": 1,\r\n        \"idMateria\": 1,\r\n        \"idDocente\": 1,\r\n        \"calificacion\": \"80.50\",\r\n        \"fecha\": \"2024-06-27\",\r\n        \"unidad\": \"3\"\r\n    }\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
 							"raw": "http://localhost:3000/sigese/calificaciones/",
 							"protocol": "http",
@@ -507,24 +871,108 @@
 				{
 					"name": "Login Admin",
 					"request": {
-						"method": "GET",
-						"header": []
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"usuario\":\"Noizey\",\r\n    \"contrasena\":\"1234\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/sigese/admin/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"sigese",
+								"admin",
+								"login"
+							]
+						}
 					},
 					"response": []
 				},
 				{
 					"name": "Login Docente",
 					"request": {
-						"method": "GET",
-						"header": []
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"correo\":\"Hugo@example.com\",\r\n    \"contrasena\":\"1234\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/sigese/docentes/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"sigese",
+								"docentes",
+								"login"
+							]
+						}
 					},
 					"response": []
 				},
 				{
 					"name": "Login Estudiante",
 					"request": {
-						"method": "GET",
-						"header": []
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n \"matricula\":\"20223TN1\",\r\n \"contrasena\":\"1234\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/sigese/estudiantes/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"sigese",
+								"estudiantes",
+								"login"
+							]
+						}
 					},
 					"response": []
 				}

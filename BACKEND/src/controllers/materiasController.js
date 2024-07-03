@@ -1,16 +1,15 @@
 const mysql = require('mysql2/promise');
-const pool = require('../../db'); // Asegúrate de que el path sea correcto
+const pool = require('../services/db');
 
 // Obtener todas las materias
 exports.getAllMaterias = async (req, res) => {
     try {
         const [rows] = await pool.query('CALL getAllMaterias()');
-        res.json(rows);
+        res.json(rows[0]);
     } catch (error) {
         console.error('Error al obtener todas las materias:', error);
         res.status(500).json({ error: 'Error al obtener materias' });
     }
-    
 };
 
 // Obtener materia por ID
@@ -30,9 +29,9 @@ exports.getMateriaById = async (req, res) => {
 
 // Crear materia
 exports.createMateria = async (req, res) => {
-    const { nombre } = req.body;
+    const { nombre, idGrupo } = req.body;
     try {
-        const [result] = await pool.query('CALL createMateria(?)', [nombre]);
+        const [result] = await pool.query('CALL createMateria(?, ?)', [nombre, idGrupo]);
         res.status(201).json({ message: 'Materia creada', id: result.insertId });
     } catch (error) {
         console.error('Error al crear la materia:', error);
@@ -43,9 +42,9 @@ exports.createMateria = async (req, res) => {
 // Actualizar materia por ID
 exports.updateMateria = async (req, res) => {
     const { id } = req.params;
-    const { nombre } = req.body;
+    const { nombre, idGrupo } = req.body;
     try {
-        const [result] = await pool.query('CALL updateMateria(?, ?)', [id, nombre]);
+        const [result] = await pool.query('CALL updateMateria(?, ?, ?)', [id, nombre, idGrupo]);
         if (result.affectedRows === 0) {
             return res.status(404).json({ error: 'Materia no encontrada' });
         }

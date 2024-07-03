@@ -1,5 +1,9 @@
 const mysql = require('mysql2/promise');
-const pool = require('../../db');
+const pool = require('../services/db');
+
+
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
 // Obtener todos los estudiantes
 exports.getAllEstudiantes = async (req, res) => {
@@ -97,38 +101,51 @@ exports.deleteEstudiante = async (req, res) => {
     }
 };
 
-// Agregar imagen de perfil de estudiante
+
+// Método para agregar imagen de perfil en la base de datos
 exports.addEstudianteImgPerfil = async (req, res) => {
     const { id } = req.params;
-    const imgPerfil = req.body.imgPerfil; 
+    const imgPerfil = req.file.buffer;  // Obtiene los datos binarios de la imagen desde multer
+
     try {
-        const [result] = await pool.query('CALL addEstudianteImgPerfil(?, ?)', [id, imgPerfil]);
-        res.status(200).json({ message: 'Imagen de perfil agregada' });
+        // Llamada al procedimiento almacenado para agregar imagen de perfil
+        await pool.query('CALL addEstudianteImgPerfil(?, ?)', [id, imgPerfil]);
+        
+        res.status(200).json({ message: 'Imagen de perfil agregada correctamente' });
     } catch (error) {
-        console.error(`Error al agregar imagen de perfil para estudiante con ID ${id}:`, error);
+        console.error('Error al agregar imagen de perfil:', error);
         res.status(500).json({ error: 'Error al agregar imagen de perfil' });
     }
 };
 
-// Actualizar imagen de perfil de estudiante
+
+// Método para actualizar la imagen de perfil en la base de datos
 exports.updateEstudianteImgPerfil = async (req, res) => {
     const { id } = req.params;
-    const imgPerfil = req.body.imgPerfil; 
+    const imgPerfil = req.file;  // Asumiendo que estás usando multer para la carga de archivos
+
     try {
-        const [result] = await pool.query('CALL updateEstudianteImgPerfil(?, ?)', [id, imgPerfil]);
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ error: `Estudiante con ID ${id} no encontrado` });
+        if (!imgPerfil) {
+            return res.status(400).json({ error: 'No se proporcionó ninguna imagen' });
         }
-        res.status(200).json({ message: 'Imagen de perfil actualizada' });
+
+        // Llamada al procedimiento almacenado para actualizar la imagen de perfil
+        await pool.query('CALL updateEstudianteImgPerfil(?, ?)', [id, imgPerfil.buffer]);
+        
+        // Si no hubo errores, enviar respuesta exitosa
+        res.status(200).json({ message: 'Imagen de perfil actualizada correctamente' });
     } catch (error) {
-        console.error(`Error al actualizar imagen de perfil para estudiante con ID ${id}:`, error);
+        console.error('Error al actualizar imagen de perfil:', error);
         res.status(500).json({ error: 'Error al actualizar imagen de perfil' });
     }
 };
 
-// Login de Estudiante
+
+
+
 exports.loginEstudiante = async (req, res) => {
     const { matricula, contrasena } = req.body;
+
     try {
         // Llamada al procedimiento almacenado para el login
         const [rows] = await pool.query('CALL loginEstudiante(?, ?, @result)', [matricula, contrasena]);
@@ -151,15 +168,23 @@ exports.loginEstudiante = async (req, res) => {
         // Obtener calificaciones del estudiante
         const [calificacionesRows] = await pool.query('SELECT * FROM CALIFICACIONES WHERE idEstudiante = ?', [estudiante.idEstudiante]);
 
+        // Crear token JWT
+        const token = jwt.sign({ idEstudiante: estudiante.idEstudiante, matricula: estudiante.matricula }, process.env.JWT_SECRET, {
+            expiresIn: '1h'
+        });
+
         // Construir el objeto de respuesta
         const response = {
             message: 'Login exitoso',
-            idEstudiante: estudiante.idEstudiante,
-            nombre: estudiante.nombre,
-            apellidoPaterno: estudiante.apellidoPaterno,
-            apellidoMaterno: estudiante.apellidoMaterno,
-            imgPerfil: estudiante.imgPerfil, // Incluir el campo de imagen de perfil si se necesita
-            calificaciones: calificacionesRows // Incluir las calificaciones del estudiante
+            token,
+            estudiante: {
+                idEstudiante: estudiante.idEstudiante,
+                nombre: estudiante.nombre,
+                apellidoPaterno: estudiante.apellidoPaterno,
+                apellidoMaterno: estudiante.apellidoMaterno,
+                imgPerfil: estudiante.imgPerfil, // Incluir el campo de imagen de perfil si se necesita
+                calificaciones: calificacionesRows // Incluir las calificaciones del estudiante
+            }
         };
 
         // Enviar la respuesta
