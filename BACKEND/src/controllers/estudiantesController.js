@@ -1,12 +1,11 @@
 const mysql = require('mysql2/promise');
 const pool = require('../services/db');
-
-
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 // Obtener todos los estudiantes
 exports.getAllEstudiantes = async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     try {
         const [rows] = await pool.query('CALL getAllEstudiantes()');
         res.json(rows[0]);
@@ -18,6 +17,7 @@ exports.getAllEstudiantes = async (req, res) => {
 
 // Obtener estudiante por ID
 exports.getEstudianteById = async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     const { id } = req.params;
     try {
         const [rows] = await pool.query('CALL getEstudianteById(?)', [id]);
@@ -33,9 +33,10 @@ exports.getEstudianteById = async (req, res) => {
 
 // Crear estudiante
 exports.createEstudiante = async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     const estudiante = req.body;
     try {
-        const [result] = await pool.query('CALL createEstudiante(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )', [
+        const [result] = await pool.query('CALL createEstudiante(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [
             estudiante.matricula,
             estudiante.nombre,
             estudiante.apellidoPaterno,
@@ -47,7 +48,8 @@ exports.createEstudiante = async (req, res) => {
             estudiante.correoElectronico,
             estudiante.contrasena,
             estudiante.idGrupo,
-            estudiante.estado
+            estudiante.estado,
+            estudiante.idPeriodo // Nuevo campo idPeriodo agregado
         ]);
         res.status(201).json({ message: 'Estudiante creado', id: result.insertId });
     } catch (error) {
@@ -58,10 +60,11 @@ exports.createEstudiante = async (req, res) => {
 
 // Actualizar estudiante por ID
 exports.updateEstudiante = async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     const { id } = req.params;
     const estudiante = req.body;
     try {
-        const [result] = await pool.query('CALL updateEstudiante(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [
+        const [result] = await pool.query('CALL updateEstudiante(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [
             id,
             estudiante.matricula,
             estudiante.nombre,
@@ -74,7 +77,8 @@ exports.updateEstudiante = async (req, res) => {
             estudiante.correoElectronico,
             estudiante.contrasena,
             estudiante.idGrupo,
-            estudiante.estado
+            estudiante.estado,
+            estudiante.idPeriodo // Nuevo campo idPeriodo agregado
         ]);
         if (result.affectedRows === 0) {
             return res.status(404).json({ error: `Estudiante con ID ${id} no encontrado` });
@@ -88,6 +92,7 @@ exports.updateEstudiante = async (req, res) => {
 
 // Eliminar estudiante por ID
 exports.deleteEstudiante = async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     const { id } = req.params;
     try {
         const [result] = await pool.query('CALL deleteEstudiante(?)', [id]);
@@ -101,9 +106,9 @@ exports.deleteEstudiante = async (req, res) => {
     }
 };
 
-
 // Método para agregar imagen de perfil en la base de datos
 exports.addEstudianteImgPerfil = async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     const { id } = req.params;
     const imgPerfil = req.file.buffer;  // Obtiene los datos binarios de la imagen desde multer
 
@@ -118,9 +123,9 @@ exports.addEstudianteImgPerfil = async (req, res) => {
     }
 };
 
-
 // Método para actualizar la imagen de perfil en la base de datos
 exports.updateEstudianteImgPerfil = async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     const { id } = req.params;
     const imgPerfil = req.file;  // Asumiendo que estás usando multer para la carga de archivos
 
@@ -140,10 +145,9 @@ exports.updateEstudianteImgPerfil = async (req, res) => {
     }
 };
 
-
-
-
+// Login de estudiante
 exports.loginEstudiante = async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     const { matricula, contrasena } = req.body;
 
     try {
@@ -165,8 +169,11 @@ exports.loginEstudiante = async (req, res) => {
 
         const estudiante = studentRows[0];
 
-        // Obtener calificaciones del estudiante
-        const [calificacionesRows] = await pool.query('SELECT * FROM CALIFICACIONES WHERE idEstudiante = ?', [estudiante.idEstudiante]);
+        // Obtener calificaciones actuales del estudiante
+        const [calificacionesActualesRows] = await pool.query('CALL getCalificacionesActuales(?)', [estudiante.idEstudiante]);
+
+        // Obtener calificaciones anteriores del estudiante
+        const [calificacionesAnterioresRows] = await pool.query('CALL getCalificacionesAnteriores(?)', [estudiante.idEstudiante]);
 
         // Crear token JWT
         const token = jwt.sign({ idEstudiante: estudiante.idEstudiante, matricula: estudiante.matricula }, process.env.JWT_SECRET, {
@@ -183,7 +190,8 @@ exports.loginEstudiante = async (req, res) => {
                 apellidoPaterno: estudiante.apellidoPaterno,
                 apellidoMaterno: estudiante.apellidoMaterno,
                 imgPerfil: estudiante.imgPerfil, // Incluir el campo de imagen de perfil si se necesita
-                calificaciones: calificacionesRows // Incluir las calificaciones del estudiante
+                calificacionesActuales: calificacionesActualesRows[0], // Incluir las calificaciones actuales del estudiante
+                calificacionesAnteriores: calificacionesAnterioresRows[0] // Incluir las calificaciones anteriores del estudiante
             }
         };
 

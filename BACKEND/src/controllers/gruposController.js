@@ -3,9 +3,10 @@ const pool = require('../services/db');
 
 // Obtener todos los grupos
 exports.getAllGrupos = async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     try {
         const [rows] = await pool.query('CALL getAllGrupos()');
-        res.json(rows);
+        res.json(rows[0]);
     } catch (error) {
         console.error('Error al obtener todos los grupos:', error);
         res.status(500).json({ error: 'Error al obtener todos los grupos' });
@@ -14,6 +15,7 @@ exports.getAllGrupos = async (req, res) => {
 
 // Obtener grupo por ID
 exports.getGrupoById = async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     const { id } = req.params;
     try {
         const [rows] = await pool.query('CALL getGrupoById(?)', [id]);
@@ -29,9 +31,10 @@ exports.getGrupoById = async (req, res) => {
 
 // Crear grupo
 exports.createGrupo = async (req, res) => {
-    const { nombre, semestre } = req.body;
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    const { nombre, idPeriodo, estado } = req.body;
     try {
-        const [result] = await pool.query('CALL createGrupo(?, ?)', [nombre, semestre]);
+        const [result] = await pool.query('CALL createGrupo(?, ?, ?)', [nombre, idPeriodo, estado]);
         res.status(201).json({ message: 'Grupo creado', id: result.insertId });
     } catch (error) {
         console.error('Error al crear el grupo:', error);
@@ -41,10 +44,11 @@ exports.createGrupo = async (req, res) => {
 
 // Actualizar grupo por ID
 exports.updateGrupo = async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     const { id } = req.params;
-    const { nombre, semestre } = req.body;
+    const { nombre, idPeriodo, estado } = req.body;
     try {
-        const [result] = await pool.query('CALL updateGrupo(?, ?, ?)', [id, nombre, semestre]);
+        const [result] = await pool.query('CALL updateGrupo(?, ?, ?, ?)', [id, nombre, idPeriodo, estado]);
         if (result.affectedRows === 0) {
             return res.status(404).json({ error: 'Grupo no encontrado' });
         }
@@ -57,6 +61,7 @@ exports.updateGrupo = async (req, res) => {
 
 // Eliminar grupo por ID
 exports.deleteGrupo = async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     const { id } = req.params;
     try {
         const [result] = await pool.query('CALL deleteGrupo(?)', [id]);

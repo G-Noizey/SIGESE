@@ -1,13 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const calificacionesController = require('../controllers/calificacionesController');
+const verifyToken = require('../services/verifyToken');
 
 // Rutas para calificaciones
-router.get('/', calificacionesController.getAllCalificaciones);
-router.get('/:id', calificacionesController.getCalificacionById);
-router.post('/', calificacionesController.createCalificacion);
-router.put('/:id', calificacionesController.updateCalificacion);
-router.delete('/:id', calificacionesController.deleteCalificacion);
-
+router.get('/', verifyToken, calificacionesController.getAllCalificaciones);
+router.get('/:id', verifyToken, calificacionesController.getCalificacionById);
+router.post('/', verifyToken, calificacionesController.createCalificacion);
+router.put('/:id', verifyToken, calificacionesController.updateCalificacion);
+router.delete('/:id', verifyToken, calificacionesController.deleteCalificacion);
 
 module.exports = router;

@@ -1,16 +1,30 @@
-CREATE DATABASE SIGESE;
+-- Eliminar la base de datos SIGESE si existe
+DROP DATABASE IF EXISTS SIGESE;
 
+-- Crear la base de datos SIGESE
+CREATE DATABASE SIGESE;
 USE SIGESE;
 
--- CREACIÓN DE TABLAS
-
-CREATE TABLE GRUPOS (
-    idGrupo INT PRIMARY KEY AUTO_INCREMENT,
+-- Tabla de Periodos
+CREATE TABLE IF NOT EXISTS PERIODOS (
+    idPeriodo INT PRIMARY KEY AUTO_INCREMENT,
     nombre VARCHAR(255) NOT NULL,
-    semestre VARCHAR(255) NOT NULL
+    semestre VARCHAR(255) NOT NULL,
+    fechaInicio DATE NOT NULL,
+    fechaFin DATE NOT NULL
 );
 
-CREATE TABLE ESTUDIANTES (
+-- Tabla de Grupos
+CREATE TABLE IF NOT EXISTS GRUPOS (
+    idGrupo INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(255) NOT NULL,
+    idPeriodo INT,
+    estado VARCHAR(255) DEFAULT 'Activo',
+    FOREIGN KEY (idPeriodo) REFERENCES PERIODOS(idPeriodo)
+);
+
+-- Tabla de Estudiantes
+CREATE TABLE IF NOT EXISTS ESTUDIANTES (
     idEstudiante INT PRIMARY KEY AUTO_INCREMENT,
     matricula VARCHAR(255) UNIQUE NOT NULL,
     nombre VARCHAR(255) NOT NULL,
@@ -20,15 +34,18 @@ CREATE TABLE ESTUDIANTES (
     fechaNacimiento DATE NOT NULL,
     direccion VARCHAR(255) NOT NULL,
     telefono VARCHAR(255),
-    correoElectronico VARCHAR(255),
+    correoElectronico VARCHAR(255) UNIQUE NOT NULL,
     imgPerfil LONGBLOB,
     contrasena VARCHAR(255) NOT NULL,
     idGrupo INT,
+    idPeriodo INT,
     estado VARCHAR(255) NOT NULL,
-    FOREIGN KEY (idGrupo) REFERENCES GRUPOS(idGrupo)
+    FOREIGN KEY (idGrupo) REFERENCES GRUPOS(idGrupo),
+    FOREIGN KEY (idPeriodo) REFERENCES PERIODOS(idPeriodo)
 );
 
-CREATE TABLE DOCENTES (
+-- Tabla de Docentes
+CREATE TABLE IF NOT EXISTS DOCENTES (
     idDocente INT PRIMARY KEY AUTO_INCREMENT,
     nombre VARCHAR(255) NOT NULL,
     apellidoPaterno VARCHAR(255) NOT NULL,
@@ -36,12 +53,13 @@ CREATE TABLE DOCENTES (
     genero VARCHAR(255) NOT NULL,
     direccion VARCHAR(255) NOT NULL,
     telefono VARCHAR(255),
-    correoElectronico VARCHAR(255),
+    correoElectronico VARCHAR(255) UNIQUE NOT NULL,
     contrasena VARCHAR(255) NOT NULL,
     estado VARCHAR(255) NOT NULL
 );
 
-CREATE TABLE DOCENTES_GRUPOS (
+-- Tabla de Relación Docentes y Grupos
+CREATE TABLE IF NOT EXISTS DOCENTES_GRUPOS (
     id INT PRIMARY KEY AUTO_INCREMENT,
     idDocente INT,
     idGrupo INT,
@@ -49,27 +67,27 @@ CREATE TABLE DOCENTES_GRUPOS (
     FOREIGN KEY (idGrupo) REFERENCES GRUPOS(idGrupo)
 );
 
-CREATE TABLE ADMIN (
+-- Tabla de Administradores
+CREATE TABLE IF NOT EXISTS ADMIN (
     idAdmin INT PRIMARY KEY AUTO_INCREMENT,
     usuario VARCHAR(255) UNIQUE NOT NULL,
     contrasena VARCHAR(255) NOT NULL,
     nombre VARCHAR(255) NOT NULL,
     apellidoPaterno VARCHAR(255) NOT NULL,
     apellidoMaterno VARCHAR(255) NOT NULL,
-    correo_electronico VARCHAR(255) NOT NULL
+    correo_electronico VARCHAR(255) UNIQUE NOT NULL
 );
 
-
-
-
-CREATE TABLE MATERIAS (
+-- Tabla de Materias
+CREATE TABLE IF NOT EXISTS MATERIAS (
     idMateria INT PRIMARY KEY AUTO_INCREMENT,
     nombre VARCHAR(255) NOT NULL,
     idGrupo INT,
     FOREIGN KEY (idGrupo) REFERENCES GRUPOS(idGrupo)
 );
 
-CREATE TABLE CALIFICACIONES (
+-- Tabla de Calificaciones
+CREATE TABLE IF NOT EXISTS CALIFICACIONES (
     idCalificacion INT PRIMARY KEY AUTO_INCREMENT,
     idEstudiante INT NOT NULL,
     idMateria INT NOT NULL,
@@ -77,37 +95,61 @@ CREATE TABLE CALIFICACIONES (
     calificacion DECIMAL(5,2) NOT NULL,
     fecha DATE NOT NULL,
     unidad VARCHAR(255) NOT NULL,
+    idPeriodo INT NOT NULL,
     FOREIGN KEY (idEstudiante) REFERENCES ESTUDIANTES(idEstudiante),
     FOREIGN KEY (idMateria) REFERENCES MATERIAS(idMateria),
-    FOREIGN KEY (idDocente) REFERENCES DOCENTES(idDocente)
+    FOREIGN KEY (idDocente) REFERENCES DOCENTES(idDocente),
+    FOREIGN KEY (idPeriodo) REFERENCES PERIODOS(idPeriodo)
 );
 
--- PROCEDIMIENTOS ALMACENADOS Y DEMÁS FUNCIONES YA INCLUÍDOS EN EL MENSAJE ANTERIOR
--- OMITIDOS PARA NO REPETIR LA INFORMACIÓN EXTENSA.
+-- Tabla de Histórico de Grupos
+CREATE TABLE IF NOT EXISTS HISTORICO_GRUPOS (
+    idHistoricoGrupo INT PRIMARY KEY AUTO_INCREMENT,
+    idGrupo INT NOT NULL,
+    idPeriodo INT NOT NULL,
+    fechaLimpieza DATE NOT NULL,
+    FOREIGN KEY (idGrupo) REFERENCES GRUPOS(idGrupo),
+    FOREIGN KEY (idPeriodo) REFERENCES PERIODOS(idPeriodo)
+);
 
+-- Tabla de Calificaciones Históricas
+CREATE TABLE IF NOT EXISTS CALIFICACIONES_HISTORICAS (
+    idCalificacionHistorica INT PRIMARY KEY AUTO_INCREMENT,
+    idEstudiante INT NOT NULL,
+    idMateria INT NOT NULL,
+    idDocente INT NOT NULL,
+    calificacion DECIMAL(5,2) NOT NULL,
+    fecha DATE NOT NULL,
+    unidad VARCHAR(255) NOT NULL,
+    idPeriodo INT NOT NULL,
+    FOREIGN KEY (idEstudiante) REFERENCES ESTUDIANTES(idEstudiante),
+    FOREIGN KEY (idMateria) REFERENCES MATERIAS(idMateria),
+    FOREIGN KEY (idDocente) REFERENCES DOCENTES(idDocente),
+    FOREIGN KEY (idPeriodo) REFERENCES PERIODOS(idPeriodo)
+);
 
+-- PA´S Y TRIGGERS  ---------------------------------------------------------------------------------------------------------------------------------------------
 
-
-
-------------------------------------------------------------------------------
-
--- Procedimientos almacenados para ESTUDIANTES
-
-DELIMITER //
+-- ESTUDIANTES --------------------------------------------------------------------------------------------------------------------------------------------------
 
 -- Obtener todos los estudiantes
+DELIMITER //
 CREATE PROCEDURE getAllEstudiantes()
 BEGIN
     SELECT * FROM ESTUDIANTES;
 END //
+DELIMITER ;
 
 -- Obtener estudiante por ID
+DELIMITER //
 CREATE PROCEDURE getEstudianteById(IN estudiante_id INT)
 BEGIN
     SELECT * FROM ESTUDIANTES WHERE idEstudiante = estudiante_id;
 END //
+DELIMITER ;
 
 -- Crear estudiante
+DELIMITER //
 CREATE PROCEDURE createEstudiante(
     IN matricula_param VARCHAR(255),
     IN nombre_param VARCHAR(255),
@@ -120,14 +162,17 @@ CREATE PROCEDURE createEstudiante(
     IN correoElectronico_param VARCHAR(255),
     IN contrasena_param VARCHAR(255),
     IN idGrupo_param INT,
-    IN estado_param VARCHAR(255)
+    IN estado_param VARCHAR(255),
+    IN idPeriodo_param INT  -- Añadido el parámetro para idPeriodo
 )
 BEGIN
-    INSERT INTO ESTUDIANTES (matricula, nombre, apellidoPaterno, apellidoMaterno, genero, fechaNacimiento, direccion, telefono, correoElectronico, contrasena, idGrupo, estado)
-    VALUES (matricula_param, nombre_param, apellidoPaterno_param, apellidoMaterno_param, genero_param, fechaNacimiento_param, direccion_param, telefono_param, correoElectronico_param, contrasena_param, idGrupo_param, estado_param);
+    INSERT INTO ESTUDIANTES (matricula, nombre, apellidoPaterno, apellidoMaterno, genero, fechaNacimiento, direccion, telefono, correoElectronico, contrasena, idGrupo, estado, idPeriodo)
+    VALUES (matricula_param, nombre_param, apellidoPaterno_param, apellidoMaterno_param, genero_param, fechaNacimiento_param, direccion_param, telefono_param, correoElectronico_param, contrasena_param, idGrupo_param, estado_param, idPeriodo_param);
 END //
+DELIMITER ;
 
 -- Actualizar estudiante
+DELIMITER //
 CREATE PROCEDURE updateEstudiante(
     IN estudiante_id INT,
     IN matricula_param VARCHAR(255),
@@ -139,9 +184,10 @@ CREATE PROCEDURE updateEstudiante(
     IN direccion_param VARCHAR(255),
     IN telefono_param VARCHAR(255),
     IN correoElectronico_param VARCHAR(255),
-    IN contrasena_param VARCHAR(255),     
+    IN contrasena_param VARCHAR(255),
     IN idGrupo_param INT,
-    IN estado_param VARCHAR(255)
+    IN estado_param VARCHAR(255),
+    IN idPeriodo_param INT  -- Añadido el parámetro para idPeriodo
 )
 BEGIN
     UPDATE ESTUDIANTES
@@ -156,20 +202,22 @@ BEGIN
         correoElectronico = correoElectronico_param,
         contrasena = contrasena_param,
         idGrupo = idGrupo_param,
-        estado = estado_param
+        estado = estado_param,
+        idPeriodo = idPeriodo_param
     WHERE idEstudiante = estudiante_id;
 END //
+DELIMITER ;
 
 -- Eliminar estudiante por ID
+DELIMITER //
 CREATE PROCEDURE deleteEstudiante(IN estudiante_id INT)
 BEGIN
     DELETE FROM ESTUDIANTES WHERE idEstudiante = estudiante_id;
 END //
+DELIMITER ;
 
-
-
+-- Agregar imagen de perfil a un estudiante
 DELIMITER //
-
 CREATE PROCEDURE addEstudianteImgPerfil(
     IN estudiante_id INT,
     IN imgPerfil_param LONGBLOB  -- Cambiado de BLOB a LONGBLOB para soportar imágenes más grandes
@@ -179,11 +227,10 @@ BEGIN
     SET imgPerfil = imgPerfil_param
     WHERE idEstudiante = estudiante_id;
 END //
+DELIMITER ;
 
-
-
+-- Actualizar imagen de perfil de un estudiante
 DELIMITER //
-
 CREATE PROCEDURE updateEstudianteImgPerfil(
     IN estudiante_id INT,
     IN imgPerfil_param LONGBLOB  -- Cambiado de BLOB a LONGBLOB para soportar imágenes más grandes
@@ -193,23 +240,64 @@ BEGIN
     SET imgPerfil = imgPerfil_param
     WHERE idEstudiante = estudiante_id;
 END //
+DELIMITER ;
+
+
+-- LISTAR ESTUDIANTES DEPENDIENDO EL GRUPO
+
+DELIMITER //
+
+CREATE PROCEDURE getAlumnosGrupo(IN docente_id INT, IN grupo_id INT)
+BEGIN
+    SELECT *
+    FROM ESTUDIANTES
+    WHERE idGrupo = grupo_id;
+END //
 
 DELIMITER ;
 
 
-DELIMITER ;
+-- Procedimiento Almacenado para Actualizar Grupo y Periodo de Estudiante
+
+DELIMITER //
+
+CREATE PROCEDURE updateEstudianteGrupoPeriodo(
+    IN estudiante_id INT,
+    IN grupo_id INT,
+    IN periodo_id INT
+)
+BEGIN
+    -- Guardar el grupo y periodo actual del estudiante
+    DECLARE grupo_actual INT;
+    DECLARE periodo_actual INT;
+    SELECT idGrupo, idPeriodo INTO grupo_actual, periodo_actual FROM ESTUDIANTES WHERE idEstudiante = estudiante_id;
+
+    -- Actualizar el grupo y periodo del estudiante
+    UPDATE ESTUDIANTES
+    SET idGrupo = grupo_id,
+        idPeriodo = periodo_id
+    WHERE idEstudiante = estudiante_id;
+
+    -- Insertar registro histórico del grupo y periodo del estudiante
+    INSERT INTO HISTORICO_GRUPOS (idGrupo, idPeriodo, fechaLimpieza)
+    VALUES (grupo_actual, periodo_actual, CURDATE());
+
+    -- Insertar calificaciones históricas del estudiante
+    INSERT INTO CALIFICACIONES_HISTORICAS (idEstudiante, idMateria, idDocente, calificacion, fecha, unidad, idPeriodo)
+    SELECT idEstudiante, idMateria, idDocente, calificacion, fecha, unidad, periodo_actual
+    FROM CALIFICACIONES
+    WHERE idEstudiante = estudiante_id AND idPeriodo = periodo_actual;
+
+    -- Eliminar calificaciones del estudiante en el grupo anterior
+    DELETE FROM CALIFICACIONES
+    WHERE idEstudiante = estudiante_id AND idPeriodo <> periodo_id;
+END //
+DELIMITER //
+-- -------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 
-
-//
-DELIMITER ;
-
-
-
--- --------------------------------------------------
-
--- DOCENTES
+-- DOCENTES -----------------------------------------------------------------------------------------------------------------------------------------------------
 
 -- Obtener todos los docentes
 DELIMITER //
@@ -282,10 +370,27 @@ BEGIN
     DELETE FROM DOCENTES WHERE idDocente = docente_id;
 END //
 DELIMITER ;
-------------------------------------------------------------------------------
 
 
--- Procedimientos almacenados para MATERIAS
+-- ASIGANCIÓN DE GRUPOS A UN DOCENTE
+
+DELIMITER //
+
+CREATE PROCEDURE asignarGrupoDocente(
+    IN docente_id INT,
+    IN grupo_id INT
+)
+BEGIN
+    INSERT INTO DOCENTES_GRUPOS (idDocente, idGrupo)
+    VALUES (docente_id, grupo_id);
+END //
+
+DELIMITER ;
+-- --------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+-- MATERIAS -------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 -- Obtener todas las materias
 DELIMITER //
@@ -302,6 +407,7 @@ BEGIN
     SELECT * FROM MATERIAS WHERE idMateria = materia_id;
 END //
 DELIMITER ;
+
 
 -- Crear materia
 DELIMITER //
@@ -337,15 +443,11 @@ BEGIN
     DELETE FROM MATERIAS WHERE idMateria = materia_id;
 END //
 DELIMITER ;
+-- --------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+-- GRUPOS -------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-
-
-
-------------------------------------------------------------------------------
-
--- Procedimientos almacenados para GRUPOS
-
+-- Obtener todos los grupos
 DELIMITER //
 CREATE PROCEDURE getAllGrupos()
 BEGIN
@@ -353,6 +455,7 @@ BEGIN
 END //
 DELIMITER ;
 
+-- Obtener grupo por ID
 DELIMITER //
 CREATE PROCEDURE getGrupoById(IN grupo_id INT)
 BEGIN
@@ -360,31 +463,37 @@ BEGIN
 END //
 DELIMITER ;
 
+-- Crear grupo
 DELIMITER //
 CREATE PROCEDURE createGrupo(
     IN nombre_param VARCHAR(255),
-    IN semestre_param VARCHAR(255)
+    IN idPeriodo_param INT,
+    IN estado_param VARCHAR(255)
 )
 BEGIN
-    INSERT INTO GRUPOS (nombre, semestre)
-    VALUES (nombre_param, semestre_param);
+    INSERT INTO GRUPOS (nombre, idPeriodo, estado)
+    VALUES (nombre_param, idPeriodo_param, estado_param);
 END //
 DELIMITER ;
 
+-- Actualizar grupo por ID
 DELIMITER //
 CREATE PROCEDURE updateGrupo(
     IN grupo_id INT,
     IN nombre_param VARCHAR(255),
-    IN semestre_param VARCHAR(255)
+    IN idPeriodo_param INT,
+    IN estado_param VARCHAR(255)
 )
 BEGIN
     UPDATE GRUPOS
     SET nombre = nombre_param,
-        semestre = semestre_param
+        idPeriodo = idPeriodo_param,
+        estado = estado_param
     WHERE idGrupo = grupo_id;
 END //
 DELIMITER ;
 
+-- Eliminar grupo por ID
 DELIMITER //
 CREATE PROCEDURE deleteGrupo(IN grupo_id INT)
 BEGIN
@@ -392,10 +501,28 @@ BEGIN
 END //
 DELIMITER ;
 
-------------------------------------------------------------------------------
 
--- Procedimientos almacenados para CALIFICACIONES
+-- LISTAR GRUPOS DEL DOCENTE
+DELIMITER //
 
+CREATE PROCEDURE getGruposDocente(IN docente_id INT)
+BEGIN
+    SELECT g.*
+    FROM GRUPOS g
+    WHERE g.idGrupo IN (
+        SELECT DISTINCT dg.idGrupo
+        FROM DOCENTES_GRUPOS dg
+        WHERE dg.idDocente = docente_id
+    );
+END //
+
+DELIMITER ;
+ -- -------------------------------------------------------------------------------------------------------------------------------------------------------------
+ 
+ 
+-- CALIFACIONES -------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Obtener todas las calificaciones
 DELIMITER //
 CREATE PROCEDURE getAllCalificaciones()
 BEGIN
@@ -403,6 +530,7 @@ BEGIN
 END //
 DELIMITER ;
 
+-- Obtener calificación por ID
 DELIMITER //
 CREATE PROCEDURE getCalificacionById(IN calificacion_id INT)
 BEGIN
@@ -410,6 +538,7 @@ BEGIN
 END //
 DELIMITER ;
 
+-- Crear calificación
 DELIMITER //
 CREATE PROCEDURE createCalificacion(
     IN idEstudiante_param INT,
@@ -417,15 +546,17 @@ CREATE PROCEDURE createCalificacion(
     IN idDocente_param INT,
     IN calificacion_param DECIMAL(5,2),
     IN fecha_param DATE,
-    IN unidad_param VARCHAR(255)
+    IN unidad_param VARCHAR(255),
+    IN idPeriodo_param INT  -- Añadido el parámetro para idPeriodo
 )
 BEGIN
-    INSERT INTO CALIFICACIONES (idEstudiante, idMateria, idDocente, calificacion, fecha, unidad)
-    VALUES (idEstudiante_param, idMateria_param, idDocente_param, calificacion_param, fecha_param, unidad_param);
+    INSERT INTO CALIFICACIONES (idEstudiante, idMateria, idDocente, calificacion, fecha, unidad, idPeriodo)
+    VALUES (idEstudiante_param, idMateria_param, idDocente_param, calificacion_param, fecha_param, unidad_param, idPeriodo_param);
 END //
 DELIMITER ;
 
 
+-- Actualizar calificación por ID
 DELIMITER //
 CREATE PROCEDURE updateCalificacion(
     IN calificacion_id INT,
@@ -433,7 +564,9 @@ CREATE PROCEDURE updateCalificacion(
     IN idMateria_param INT,
     IN idDocente_param INT,
     IN calificacion_param DECIMAL(5,2),
-    IN fecha_param DATE
+    IN fecha_param DATE,
+    IN unidad_param VARCHAR(255),
+    IN idPeriodo_param INT  -- Añadido el parámetro para idPeriodo
 )
 BEGIN
     UPDATE CALIFICACIONES
@@ -441,20 +574,178 @@ BEGIN
         idMateria = idMateria_param,
         idDocente = idDocente_param,
         calificacion = calificacion_param,
-        fecha = fecha_param
+        fecha = fecha_param,
+        unidad = unidad_param,
+        idPeriodo = idPeriodo_param
     WHERE idCalificacion = calificacion_id;
 END //
 DELIMITER ;
 
+-- Eliminar calificación por ID
 DELIMITER //
 CREATE PROCEDURE deleteCalificacion(IN calificacion_id INT)
 BEGIN
     DELETE FROM CALIFICACIONES WHERE idCalificacion = calificacion_id;
 END //
 DELIMITER ;
-------------------------------------------------------------------------------
 
--- Procedimiento almacenado para Login de Estudiantes
+
+-- Procedimiento Almacenado para obtener calificaciones actuales del estudiante
+
+DELIMITER //
+
+CREATE PROCEDURE getCalificacionesActuales(
+    IN estudiante_id INT
+)
+BEGIN
+    SELECT 
+        C.idCalificacion AS idCalificacion,
+        E.matricula AS MatriculaEstudiante,
+        CONCAT(E.nombre, ' ', E.apellidoPaterno, ' ', E.apellidoMaterno) AS NombreEstudiante,
+        M.nombre AS Materia,
+        CONCAT(D.nombre, ' ', D.apellidoPaterno, ' ', D.apellidoMaterno) AS NombreDocente,
+        C.calificacion,
+        C.fecha,
+        C.unidad,
+        P.nombre AS NombrePeriodo,
+        P.semestre,
+        P.fechaInicio,
+        P.fechaFin
+    FROM CALIFICACIONES C
+    INNER JOIN ESTUDIANTES E ON C.idEstudiante = E.idEstudiante
+    INNER JOIN MATERIAS M ON C.idMateria = M.idMateria
+    INNER JOIN DOCENTES D ON C.idDocente = D.idDocente
+    INNER JOIN PERIODOS P ON C.idPeriodo = P.idPeriodo
+    WHERE E.idEstudiante = estudiante_id;
+END //
+
+DELIMITER ;
+
+
+-- Procedimiento Almacenado para Obtener Calificaciones Anteriores de un Estudiante
+DELIMITER //
+
+CREATE PROCEDURE getCalificacionesAnteriores(
+    IN estudiante_id INT
+)
+BEGIN
+    -- Obtener calificaciones anteriores del estudiante
+    SELECT 
+        CH.idCalificacionHistorica AS idCalificacion,
+        E.matricula AS MatriculaEstudiante,
+        CONCAT(E.nombre, ' ', E.apellidoPaterno, ' ', E.apellidoMaterno) AS NombreEstudiante,
+        M.nombre AS Materia,
+        CONCAT(D.nombre, ' ', D.apellidoPaterno, ' ', D.apellidoMaterno) AS NombreDocente,
+        CH.calificacion,
+        CH.fecha,
+        CH.unidad,
+        P.nombre AS NombrePeriodo,
+        P.semestre,
+        P.fechaInicio,
+        P.fechaFin
+    FROM CALIFICACIONES_HISTORICAS CH
+    INNER JOIN ESTUDIANTES E ON CH.idEstudiante = E.idEstudiante
+    INNER JOIN MATERIAS M ON CH.idMateria = M.idMateria
+    INNER JOIN DOCENTES D ON CH.idDocente = D.idDocente
+    INNER JOIN PERIODOS P ON CH.idPeriodo = P.idPeriodo
+    WHERE E.idEstudiante = estudiante_id;
+END //
+
+DELIMITER ;
+
+
+-- Trigger para Actualizar Calificaciones Históricas al Cambiar Grupo o Periodo
+ 
+DELIMITER //
+
+CREATE TRIGGER trg_actualizar_calificaciones_historicas
+AFTER UPDATE ON ESTUDIANTES
+FOR EACH ROW
+BEGIN
+    -- Verificar si ha cambiado el grupo o el periodo del estudiante
+    IF NEW.idGrupo <> OLD.idGrupo OR NEW.idPeriodo <> OLD.idPeriodo THEN
+        -- Insertar calificaciones históricas del estudiante
+        INSERT INTO CALIFICACIONES_HISTORICAS (idEstudiante, idMateria, idDocente, calificacion, fecha, unidad, idPeriodo)
+        SELECT idEstudiante, idMateria, idDocente, calificacion, fecha, unidad, OLD.idPeriodo
+        FROM CALIFICACIONES
+        WHERE idEstudiante = OLD.idEstudiante AND idPeriodo = OLD.idPeriodo;
+
+        -- Eliminar calificaciones del estudiante en el grupo y periodo anterior
+        DELETE FROM CALIFICACIONES
+        WHERE idEstudiante = OLD.idEstudiante AND idPeriodo = OLD.idPeriodo;
+    END IF;
+END //
+DELIMITER ;
+
+ -- -------------------------------------------------------------------------------------------------------------------------------------------------------------
+ 
+ 
+ -- PERIODOS -------------------------------------------------------------------------------------------------------------------------------------------------------------
+ 
+ -- Obtener todos los periodos
+DELIMITER //
+CREATE PROCEDURE getAllPeriodos()
+BEGIN
+    SELECT * FROM PERIODOS;
+END //
+DELIMITER ;
+
+-- Obtener periodo por ID
+DELIMITER //
+CREATE PROCEDURE getPeriodoById(IN periodo_id INT)
+BEGIN
+    SELECT * FROM PERIODOS WHERE idPeriodo = periodo_id;
+END //
+DELIMITER ;
+
+-- Crear periodo
+DELIMITER //
+CREATE PROCEDURE createPeriodo(
+    IN nombre_param VARCHAR(255),
+    IN semestre_param VARCHAR(255),
+    IN fechaInicio_param DATE,
+    IN fechaFin_param DATE
+)
+BEGIN
+    INSERT INTO PERIODOS (nombre, semestre, fechaInicio, fechaFin)
+    VALUES (nombre_param, semestre_param, fechaInicio_param, fechaFin_param);
+END //
+DELIMITER ;
+
+-- Actualizar periodo por ID
+DELIMITER //
+CREATE PROCEDURE updatePeriodo(
+    IN periodo_id INT,
+    IN nombre_param VARCHAR(255),
+    IN semestre_param VARCHAR(255),
+    IN fechaInicio_param DATE,
+    IN fechaFin_param DATE
+)
+BEGIN
+    UPDATE PERIODOS
+    SET nombre = nombre_param,
+        semestre = semestre_param,
+        fechaInicio = fechaInicio_param,
+        fechaFin = fechaFin_param
+    WHERE idPeriodo = periodo_id;
+END //
+DELIMITER ;
+
+-- Eliminar periodo por ID
+DELIMITER //
+CREATE PROCEDURE deletePeriodo(IN periodo_id INT)
+BEGIN
+    DELETE FROM PERIODOS WHERE idPeriodo = periodo_id;
+END //
+DELIMITER ;
+ -- -------------------------------------------------------------------------------------------------------------------------------------------------------------
+ 
+ 
+ 
+ 
+ -- LOGINS -------------------------------------------------------------------------------------------------------------------------------------------------------
+ 
+ -- Procedimiento almacenado para Login de Estudiantes
 
 DELIMITER //
 CREATE PROCEDURE loginEstudiante(
@@ -526,75 +817,61 @@ END //
 DELIMITER ;
 
 -- -------------------------------------------------------------------------------
+ 
+ 
+ 
 
--- LISTAR GRUPOS DEL DOCENTE
 
-DELIMITER //
+-- Inserciones de Prueba
+ -- -------------------------------------------------------------------------------------------------------------------------------------------
 
-CREATE PROCEDURE getGruposDocente(IN docente_id INT)
-BEGIN
-    SELECT g.*
-    FROM GRUPOS g
-    WHERE g.idGrupo IN (
-        SELECT DISTINCT dg.idGrupo
-        FROM DOCENTES_GRUPOS dg
-        WHERE dg.idDocente = docente_id
-    );
-END //
+-- Insertar períodos académicos
+CALL createPeriodo('1er Semestre 2024', 'Enero-Junio 2024', '2024-01-01', '2024-06-30');
+CALL createPeriodo('2do Semestre 2024', 'Junio-Diciembre 2024', '2024-06-30', '2024-12-20');
 
-DELIMITER ;
+-- Insertar grupos
+INSERT INTO GRUPOS (nombre, idPeriodo) VALUES ('Grupo 1', 1);
+INSERT INTO GRUPOS (nombre, idPeriodo) VALUES ('Grupo 2', 1);
+INSERT INTO GRUPOS (nombre, idPeriodo) VALUES ('Grupo 3', 2);
 
--- -------------------------------------------------------------------------------
+-- Insertar estudiantes
+INSERT INTO ESTUDIANTES (matricula, nombre, apellidoPaterno, apellidoMaterno, genero, fechaNacimiento, direccion, telefono, correoElectronico, contrasena, idGrupo, idPeriodo, estado)
+VALUES ('2024001', 'Juan', 'Pérez', 'González', 'Masculino', '2000-01-15', 'Calle 123', '555-1234', 'juan@example.com', 'password123', 1, 1, 'Activo');
 
--- LISTAR ESTUDIANTES DEPENDIENDO EL GRUPO
+INSERT INTO ESTUDIANTES (matricula, nombre, apellidoPaterno, apellidoMaterno, genero, fechaNacimiento, direccion, telefono, correoElectronico, contrasena, idGrupo, idPeriodo, estado)
+VALUES ('2024002', 'María', 'García', 'López', 'Femenino', '2000-02-20', 'Av. Principal 456', '555-5678', 'maria@example.com', 'password456', 2, 1, 'Activo');
 
-DELIMITER //
+-- Insertar docentes
+INSERT INTO DOCENTES (nombre, apellidoPaterno, apellidoMaterno, genero, direccion, telefono, correoElectronico, contrasena, estado)
+VALUES ('Pedro', 'Martínez', 'Sánchez', 'Masculino', 'Av. Universidad 789', '555-7890', 'pedro@example.com', 'password789', 'Activo');
 
-CREATE PROCEDURE getAlumnosGrupo(IN docente_id INT, IN grupo_id INT)
-BEGIN
-    SELECT *
-    FROM ESTUDIANTES
-    WHERE idGrupo = grupo_id;
-END //
+-- Insertar materias
+INSERT INTO MATERIAS (nombre, idGrupo) VALUES ('Matemáticas', 1);
+INSERT INTO MATERIAS (nombre, idGrupo) VALUES ('Ciencias', 1);
+INSERT INTO MATERIAS (nombre, idGrupo) VALUES ('Historia', 2);
 
-DELIMITER ;
+-- Insertar calificaciones
+INSERT INTO CALIFICACIONES (idEstudiante, idMateria, idDocente, calificacion, fecha, unidad, idPeriodo)
+VALUES (1, 1, 1, 90.5, '2024-06-20', 'Parcial 1', 1);
+INSERT INTO CALIFICACIONES (idEstudiante, idMateria, idDocente, calificacion, fecha, unidad, idPeriodo)
+VALUES (1, 1, 1, 20.5, '2024-06-20', 'Parcial 2', 1);
+INSERT INTO CALIFICACIONES (idEstudiante, idMateria, idDocente, calificacion, fecha, unidad, idPeriodo)
+VALUES (1, 1, 1, 40.5, '2024-06-20', 'Parcial 3', 1);
 
--- -------------------------------------------------------------------------------
+ -- -------------------------------------------------------------------------------------------------------------------------------------------
 
--- ASIGNAR CALIFICACIÓN A ESTUDIANTE 
 
-DELIMITER //
+-- Verificar inserciones
+SELECT * FROM PERIODOS;
+SELECT * FROM GRUPOS;
+SELECT * FROM ESTUDIANTES;
+SELECT * FROM DOCENTES;
+SELECT * FROM DOCENTES_GRUPOS;
+SELECT * FROM ADMIN;
+SELECT * FROM MATERIAS;
+SELECT * FROM CALIFICACIONES;
+SELECT * FROM HISTORICO_GRUPOS;
+SELECT * FROM CALIFICACIONES_HISTORICAS;
 
-CREATE PROCEDURE asignarCalificaciones(
-    IN estudiante_id INT,
-    IN materia_id INT,
-    IN docente_id INT,
-    IN calificacion DECIMAL(5,2),
-    IN fecha DATE,
-    IN unidad VARCHAR(255)
-)
-BEGIN
-    INSERT INTO CALIFICACIONES (idEstudiante, idMateria, idDocente, calificacion, fecha, unidad)
-    VALUES (estudiante_id, materia_id, docente_id, calificacion, fecha, unidad);
-END //
 
-DELIMITER ;
 
--- -------------------------------------------------------------------------------
-
--- ASIGANCIÓN DE GRUPOS A UN DOCENTE
-
-DELIMITER //
-
-CREATE PROCEDURE asignarGrupoDocente(
-    IN docente_id INT,
-    IN grupo_id INT
-)
-BEGIN
-    INSERT INTO DOCENTES_GRUPOS (idDocente, idGrupo)
-    VALUES (docente_id, grupo_id);
-END //
-
-DELIMITER ;
-
--- -------------------------------------------------------------------------------

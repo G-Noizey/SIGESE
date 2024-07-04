@@ -6,6 +6,7 @@ require('dotenv').config();
 
 // Obtener grupos de un docente
 exports.getGruposDocente = async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     const { docente_id } = req.params;
     try {
         const [rows] = await pool.query('CALL getGruposDocente(?)', [docente_id]);
@@ -20,6 +21,7 @@ exports.getGruposDocente = async (req, res) => {
 
 // Obtener alumnos de un grupo asignado a un docente
 exports.getAlumnosGrupo = async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     const { docente_id, grupo_id } = req.params;
     try {
         const [rows] = await pool.query('CALL getAlumnosGrupo(?, ?)', [docente_id, grupo_id]);
@@ -34,6 +36,7 @@ exports.getAlumnosGrupo = async (req, res) => {
 
 // Asignar calificación a un estudiante por materia y unidad
 exports.asignarCalificacion = async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     const { estudiante_id, materia_id, docente_id, calificacion, fecha, unidad } = req.body;
     try {
         await pool.query('CALL asignarCalificaciones(?, ?, ?, ?, ?, ?)', [estudiante_id, materia_id, docente_id, calificacion, fecha, unidad]);
@@ -48,6 +51,7 @@ exports.asignarCalificacion = async (req, res) => {
 
 // Asignar grupo a un docente
 exports.asignarGrupoDocente = async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     const { docente_id, grupo_id } = req.body;
     try {
         await pool.query('CALL asignarGrupoDocente(?, ?)', [docente_id, grupo_id]);
@@ -62,6 +66,7 @@ exports.asignarGrupoDocente = async (req, res) => {
 
 // Obtener todos los docentes
 exports.getAllDocentes = async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     try {
         const [rows] = await pool.query('CALL getAllDocentes()');
         res.json(rows[0]);
@@ -73,6 +78,7 @@ exports.getAllDocentes = async (req, res) => {
 
 // Obtener docente por ID
 exports.getDocenteById = async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     const { id } = req.params;
     try {
         const [rows] = await pool.query('CALL getDocenteById(?)', [id]);
@@ -88,6 +94,7 @@ exports.getDocenteById = async (req, res) => {
 
 // Crear docente
 exports.createDocente = async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     const docente = req.body;
     try {
         const [result] = await pool.query('CALL createDocente(?, ?, ?, ?, ?, ?, ?, ?, ?)', [
@@ -111,10 +118,11 @@ exports.createDocente = async (req, res) => {
 
 // Actualizar docente por ID
 exports.updateDocente = async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     const { id } = req.params;
     const docente = req.body;
     try {
-        const [result] = await pool.query('CALL updateDocente(?, ?, ?, ?, ?, ?, ?, ?, ?)', [
+        const [result] = await pool.query('CALL updateDocente(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [
             id,
             docente.nombre,
             docente.apellidoPaterno,
@@ -138,6 +146,7 @@ exports.updateDocente = async (req, res) => {
 
 // Eliminar docente por ID
 exports.deleteDocente = async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     const { id } = req.params;
     try {
         const [result] = await pool.query('CALL deleteDocente(?)', [id]);
@@ -151,25 +160,10 @@ exports.deleteDocente = async (req, res) => {
     }
 };
 
-// Login de docente
-exports.loginDocente = async (req, res) => {
-    const { correoElectronico, contrasena } = req.body;
-    try {
-        const [rows] = await pool.query('CALL loginDocente(?, ?)', [correoElectronico, contrasena]);
-        if (rows[0].length === 0) {
-            return res.status(401).json({ error: 'Credenciales incorrectas' });
-        }
-        const docente = rows[0][0];
-        // Aquí podrías generar un token JWT si lo deseas
-        res.json({ message: 'Login exitoso', docente });
-    } catch (error) {
-        console.error('Error en el login del docente:', error);
-        res.status(500).json({ error: 'Error en el login del docente' });
-    }
-};
 
 
 exports.loginDocente = async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     const { correo, contrasena } = req.body;
 
     try {

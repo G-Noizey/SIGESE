@@ -3,6 +3,7 @@ const pool = require('../services/db');
 
 // Obtener todas las calificaciones
 exports.getAllCalificaciones = async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     try {
         const [rows] = await pool.query('CALL getAllCalificaciones()');
         res.json(rows[0]);
@@ -14,6 +15,7 @@ exports.getAllCalificaciones = async (req, res) => {
 
 // Obtener calificación por ID
 exports.getCalificacionById = async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     const { id } = req.params;
     try {
         const [rows] = await pool.query('CALL getCalificacionById(?)', [id]);
@@ -29,15 +31,17 @@ exports.getCalificacionById = async (req, res) => {
 
 // Crear calificación
 exports.createCalificacion = async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     const calificacion = req.body;
     try {
-        const [result] = await pool.query('CALL createCalificacion(?, ?, ?, ?, ?, ?)', [
+        const [result] = await pool.query('CALL createCalificacion(?, ?, ?, ?, ?, ?, ?)', [
             calificacion.idEstudiante,
             calificacion.idMateria,
             calificacion.idDocente,
             calificacion.calificacion,
             calificacion.fecha,
-            calificacion.unidad
+            calificacion.unidad,
+            calificacion.idPeriodo // Nuevo parámetro
         ]);
         res.status(201).json({ message: 'Calificación creada', id: result.insertId });
     } catch (error) {
@@ -48,17 +52,19 @@ exports.createCalificacion = async (req, res) => {
 
 // Actualizar calificación por ID
 exports.updateCalificacion = async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     const { id } = req.params;
     const calificacion = req.body;
     try {
-        const [result] = await pool.query('CALL updateCalificacion(?, ?, ?, ?, ?, ?, ?)', [
+        const [result] = await pool.query('CALL updateCalificacion(?,?, ?, ?, ?, ?, ?, ?)', [
             id,
             calificacion.idEstudiante,
             calificacion.idMateria,
             calificacion.idDocente,
             calificacion.calificacion,
             calificacion.fecha,
-            calificacion.unidad
+            calificacion.unidad,
+            calificacion.idPeriodo // Nuevo parámetro
         ]);
         if (result.affectedRows === 0) {
             return res.status(404).json({ error: `Calificación con ID ${id} no encontrada` });
@@ -72,6 +78,7 @@ exports.updateCalificacion = async (req, res) => {
 
 // Eliminar calificación por ID
 exports.deleteCalificacion = async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     const { id } = req.params;
     try {
         const [result] = await pool.query('CALL deleteCalificacion(?)', [id]);
@@ -84,4 +91,3 @@ exports.deleteCalificacion = async (req, res) => {
         res.status(500).json({ error: 'Error al eliminar calificación' });
     }
 };
-

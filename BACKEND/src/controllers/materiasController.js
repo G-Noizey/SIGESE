@@ -3,6 +3,7 @@ const pool = require('../services/db');
 
 // Obtener todas las materias
 exports.getAllMaterias = async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     try {
         const [rows] = await pool.query('CALL getAllMaterias()');
         res.json(rows[0]);
@@ -14,6 +15,7 @@ exports.getAllMaterias = async (req, res) => {
 
 // Obtener materia por ID
 exports.getMateriaById = async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     const { id } = req.params;
     try {
         const [rows] = await pool.query('CALL getMateriaById(?)', [id]);
@@ -29,6 +31,7 @@ exports.getMateriaById = async (req, res) => {
 
 // Crear materia
 exports.createMateria = async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     const { nombre, idGrupo } = req.body;
     try {
         const [result] = await pool.query('CALL createMateria(?, ?)', [nombre, idGrupo]);
@@ -41,6 +44,7 @@ exports.createMateria = async (req, res) => {
 
 // Actualizar materia por ID
 exports.updateMateria = async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     const { id } = req.params;
     const { nombre, idGrupo } = req.body;
     try {
@@ -57,6 +61,7 @@ exports.updateMateria = async (req, res) => {
 
 // Eliminar materia por ID
 exports.deleteMateria = async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     const { id } = req.params;
     try {
         const [result] = await pool.query('CALL deleteMateria(?)', [id]);
