@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const cors = require('cors'); // Importa cors
 const estudiantesRoutes = require('./routes/estudiantesRoute');
 const docentesRoutes = require('./routes/docentesRoute');
 const materiasRoutes = require('./routes/materiasRoute');
@@ -12,6 +13,9 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
+
+// Configura CORS para permitir solicitudes desde cualquier origen
+app.use(cors());
 
 // Rutas principales
 app.use('/sigese/estudiantes', estudiantesRoutes);
