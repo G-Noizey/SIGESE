@@ -10,4 +10,7 @@ router.post('/', verifyToken, gruposController.createGrupo);
 router.put('/:id', verifyToken, gruposController.updateGrupo);
 router.delete('/:id', verifyToken, gruposController.deleteGrupo);
 
+// Nueva ruta para obtener grupos por ID de periodo
+router.get('/periodo/:periodoId', verifyToken, gruposController.getGruposByPeriodoId);
+
 module.exports = router;

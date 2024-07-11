@@ -42,7 +42,7 @@ function DashBoard() {
             {/* Barra de navegación */}
             <Navbar bg="light" variant="light" expand="lg">
                 <Container fluid>
-                    <Navbar.Brand as={Link} to="/" style={{ fontFamily: 'Ropa Sans' }}>SISTEMA DE GESTIÓN DE SERVICIOS EDUCATIVOS</Navbar.Brand>
+                    <Navbar.Brand  style={{ fontFamily: 'Ropa Sans' }}>SISTEMA DE GESTIÓN DE SERVICIOS EDUCATIVOS</Navbar.Brand>
                     <Navbar.Toggle aria-controls="basic-navbar-nav" />
                     <Navbar.Collapse id="basic-navbar-nav">
                         <Nav className="ms-auto">

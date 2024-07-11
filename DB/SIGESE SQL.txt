@@ -37,12 +37,15 @@ CREATE TABLE IF NOT EXISTS ESTUDIANTES (
     correoElectronico VARCHAR(255) UNIQUE NOT NULL,
     imgPerfil LONGBLOB,
     contrasena VARCHAR(255) NOT NULL,
-    idGrupo INT,
-    idPeriodo INT,
+    idGrupo INT NOT NULL,
+    idPeriodo INT NOT NULL,
     estado VARCHAR(255) NOT NULL,
     FOREIGN KEY (idGrupo) REFERENCES GRUPOS(idGrupo),
     FOREIGN KEY (idPeriodo) REFERENCES PERIODOS(idPeriodo)
 );
+
+
+
 
 -- Tabla de Docentes
 CREATE TABLE IF NOT EXISTS DOCENTES (
@@ -61,8 +64,8 @@ CREATE TABLE IF NOT EXISTS DOCENTES (
 -- Tabla de Relación Docentes y Grupos
 CREATE TABLE IF NOT EXISTS DOCENTES_GRUPOS (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    idDocente INT,
-    idGrupo INT,
+    idDocente INT NOT NULL,
+    idGrupo INT NOT NULL,
     FOREIGN KEY (idDocente) REFERENCES DOCENTES(idDocente),
     FOREIGN KEY (idGrupo) REFERENCES GRUPOS(idGrupo)
 );
@@ -82,7 +85,7 @@ CREATE TABLE IF NOT EXISTS ADMIN (
 CREATE TABLE IF NOT EXISTS MATERIAS (
     idMateria INT PRIMARY KEY AUTO_INCREMENT,
     nombre VARCHAR(255) NOT NULL,
-    idGrupo INT,
+    idGrupo INT NOT NULL,
     FOREIGN KEY (idGrupo) REFERENCES GRUPOS(idGrupo)
 );
 
@@ -517,6 +520,22 @@ BEGIN
 END //
 
 DELIMITER ;
+
+
+DELIMITER //
+
+CREATE PROCEDURE getGruposByPeriodoId(IN p_periodoId INT)
+BEGIN
+    SELECT * 
+    FROM Grupos
+    WHERE idPeriodo = p_periodoId;
+END //
+
+DELIMITER ;
+
+
+
+
  -- -------------------------------------------------------------------------------------------------------------------------------------------------------------
  
  
@@ -866,12 +885,12 @@ SELECT * FROM PERIODOS;
 SELECT * FROM GRUPOS;
 SELECT * FROM ESTUDIANTES;
 SELECT * FROM DOCENTES;
+
 SELECT * FROM DOCENTES_GRUPOS;
 SELECT * FROM ADMIN;
 SELECT * FROM MATERIAS;
 SELECT * FROM CALIFICACIONES;
 SELECT * FROM HISTORICO_GRUPOS;
 SELECT * FROM CALIFICACIONES_HISTORICAS;
-
 
 

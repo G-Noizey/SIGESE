@@ -29,6 +29,19 @@ exports.getGrupoById = async (req, res) => {
     }
 };
 
+// Obtener grupos por periodo ID
+exports.getGruposByPeriodoId = async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    const { periodoId } = req.params; // Obtener periodoId del parámetro de ruta
+    try {
+        const [rows] = await pool.query('CALL getGruposByPeriodoId(?)', [periodoId]);
+        res.json(rows[0]);
+    } catch (error) {
+        console.error('Error al obtener los grupos por periodo ID:', error);
+        res.status(500).json({ error: 'Error al obtener los grupos por periodo ID' });
+    }
+};
+
 // Crear grupo
 exports.createGrupo = async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
