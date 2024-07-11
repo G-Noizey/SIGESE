@@ -16,7 +16,13 @@
 					},
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZEFkbWluIjoxLCJ1c3VhcmlvIjoiTm9pemV5Iiwibm9tYnJlIjoiTW9pc2VzIiwiYXBlbGxpZG9QYXRlcm5vIjoiTW9yYWxlcyIsImFwZWxsaWRvTWF0ZXJubyI6IkNvbGluIiwiY29ycmVvX2VsZWN0cm9uaWNvIjoibW95bW9yY29sOThAZ21haWwuY29tIiwiaWF0IjoxNzIwNjQyODkwLCJleHAiOjE3MjA2NDY0OTB9.TOxiZslnzFkEqzvcREkEGYPL5Fh189-B315CVWJR124",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
 							"raw": "",
@@ -155,7 +161,13 @@
 					},
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZEFkbWluIjoxLCJ1c3VhcmlvIjoiTm9pemV5Iiwibm9tYnJlIjoiTW9pc2VzIiwiYXBlbGxpZG9QYXRlcm5vIjoiTW9yYWxlcyIsImFwZWxsaWRvTWF0ZXJubyI6IkNvbGluIiwiY29ycmVvX2VsZWN0cm9uaWNvIjoibW95bW9yY29sOThAZ21haWwuY29tIiwiaWF0IjoxNzIwNDY4ODU0LCJleHAiOjE3MjA0NzI0NTR9.yFCROiwyRnws8BFxXE6zXEWXZ8F5clKkGw8I9Qfq5ds",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
 							"raw": "",
@@ -281,6 +293,34 @@
 						"header": []
 					},
 					"response": []
+				},
+				{
+					"name": "FindByPeriodo",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZEFkbWluIjoxLCJ1c3VhcmlvIjoiTm9pemV5Iiwibm9tYnJlIjoiTW9pc2VzIiwiYXBlbGxpZG9QYXRlcm5vIjoiTW9yYWxlcyIsImFwZWxsaWRvTWF0ZXJubyI6IkNvbGluIiwiY29ycmVvX2VsZWN0cm9uaWNvIjoibW95bW9yY29sOThAZ21haWwuY29tIiwiaWF0IjoxNzIwNjMwMDI1LCJleHAiOjE3MjA2MzM2MjV9.QxIxet8NApDzclxtjHg-LelE31LF_qZ_QW7xQWFnJzw",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:3000/sigese/grupos/periodo/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"sigese",
+								"grupos",
+								"periodo",
+								"1"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -294,8 +334,14 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZEVzdHVkaWFudGUiOjEsIm1hdHJpY3VsYSI6IjIwMjQwMDEiLCJpYXQiOjE3MjAwNTg1MTAsImV4cCI6MTcyMDA2MjExMH0.CwZPLfA2emEQCtjqKHaxLNQOM0mZBfcugbwIscYK5Bo",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZEFkbWluIjoxLCJ1c3VhcmlvIjoiTm9pemV5Iiwibm9tYnJlIjoiTW9pc2VzIiwiYXBlbGxpZG9QYXRlcm5vIjoiTW9yYWxlcyIsImFwZWxsaWRvTWF0ZXJubyI6IkNvbGluIiwiY29ycmVvX2VsZWN0cm9uaWNvIjoibW95bW9yY29sOThAZ21haWwuY29tIiwiaWF0IjoxNzIwNjMwMDI1LCJleHAiOjE3MjA2MzM2MjV9.QxIxet8NApDzclxtjHg-LelE31LF_qZ_QW7xQWFnJzw",
 								"type": "text"
+							},
+							{
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
 							}
 						],
 						"url": {
@@ -539,7 +585,7 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZEVzdHVkaWFudGUiOjEsIm1hdHJpY3VsYSI6IjIwMjQwMDEiLCJpYXQiOjE3MjAwNTg1MTAsImV4cCI6MTcyMDA2MjExMH0.CwZPLfA2emEQCtjqKHaxLNQOM0mZBfcugbwIscYK5Bo",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZEFkbWluIjoxLCJ1c3VhcmlvIjoiTm9pemV5Iiwibm9tYnJlIjoiTW9pc2VzIiwiYXBlbGxpZG9QYXRlcm5vIjoiTW9yYWxlcyIsImFwZWxsaWRvTWF0ZXJubyI6IkNvbGluIiwiY29ycmVvX2VsZWN0cm9uaWNvIjoibW95bW9yY29sOThAZ21haWwuY29tIiwiaWF0IjoxNzIwNjMwMDI1LCJleHAiOjE3MjA2MzM2MjV9.QxIxet8NApDzclxtjHg-LelE31LF_qZ_QW7xQWFnJzw",
 								"type": "text"
 							}
 						],
@@ -611,7 +657,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n\"nombre\":\"Nuevo\",\r\n\"apellidoPaterno\":\"Alejandrez\",\r\n\"apellidoMaterno\":\"Naranjo\",\r\n\"genero\":\"Masculino\",\r\n\"direccion\":\"Uber Uknown\",\r\n\"telefono\":\"7778390934\",\r\n\"correoElectronico\":\"Nuevo@example.com\",\r\n\"contrasena\":\"1234\",\r\n\"estado\":\"Activo\"\r\n\r\n}",
+							"raw": "{\r\n\"nombre\":\"\",\r\n\"apellidoPaterno\":\"\",\r\n\"apellidoMaterno\":\"\",\r\n\"genero\":\"\",\r\n\"direccion\":\"\",\r\n\"telefono\":\"\",\r\n\"correoElectronico\":\"\",\r\n\"contrasena\":\"\",\r\n\"estado\":\"\"\r\n\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1043,7 +1089,13 @@
 					"name": "FindAll",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZEFkbWluIjoxLCJ1c3VhcmlvIjoiTm9pemV5Iiwibm9tYnJlIjoiTW9pc2VzIiwiYXBlbGxpZG9QYXRlcm5vIjoiTW9yYWxlcyIsImFwZWxsaWRvTWF0ZXJubyI6IkNvbGluIiwiY29ycmVvX2VsZWN0cm9uaWNvIjoibW95bW9yY29sOThAZ21haWwuY29tIiwiaWF0IjoxNzIwNDY4ODU0LCJleHAiOjE3MjA0NzI0NTR9.yFCROiwyRnws8BFxXE6zXEWXZ8F5clKkGw8I9Qfq5ds",
+								"type": "text"
+							}
+						],
 						"url": {
 							"raw": "http://localhost:3000/sigese/periodos/",
 							"protocol": "http",
